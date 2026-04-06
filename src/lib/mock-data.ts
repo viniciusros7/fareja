@@ -1,4 +1,4 @@
-import type { Kennel, Puppy, Breeder, Review, Post } from "@/types";
+import type { Kennel, Puppy, Breeder, Review, Post, BreedGuide, FeedPost, VetRecommendation, FoodStoreRecommendation } from "@/types";
 
 export const mockKennels: (Kennel & { puppies: Puppy[]; breeders: Breeder[] })[] = [
   {
@@ -20,7 +20,7 @@ export const mockKennels: (Kennel & { puppies: Puppy[]; breeders: Breeder[] })[]
     years_active: 35,
     kc_registry: "CBKC #1204",
     kc_entity: "CBKC",
-    plan: "premium",
+    plan: "super_premium",
     status: "approved",
     verified_at: "2026-01-15T00:00:00Z",
     breeds: ["Shih Tzu", "Lhasa Apso", "Maltês"],
@@ -202,3 +202,40 @@ export const allBreeds = [
 ];
 
 export const allStates = ["SP", "PR", "MG", "RJ", "RS", "SC", "BA", "PE", "CE", "GO"];
+
+export const breedGuide: BreedGuide[] = [
+  { name: "Shih Tzu", size: "small", good_with_kids: true, apartment_friendly: "yes", energy_level: "low", grooming: "high", description: "Companheiro dócil e afetuoso. Perfeito para apartamentos e famílias com crianças. Precisa de escovação frequente.", traits: ["Carinhoso", "Calmo", "Adaptável", "Brincalhão"], photo_url: null },
+  { name: "Lhasa Apso", size: "small", good_with_kids: true, apartment_friendly: "yes", energy_level: "medium", grooming: "high", description: "Independente mas leal. Excelente cão de alerta, adapta-se muito bem a espaços menores.", traits: ["Leal", "Alerta", "Independente", "Corajoso"], photo_url: null },
+  { name: "Maltês", size: "small", good_with_kids: true, apartment_friendly: "yes", energy_level: "medium", grooming: "high", description: "Elegante e brincalhão. Não solta pelo, ótimo para pessoas alérgicas. Muito apegado ao dono.", traits: ["Elegante", "Brincalhão", "Hipoalergênico", "Sociável"], photo_url: null },
+  { name: "Golden Retriever", size: "large", good_with_kids: true, apartment_friendly: "with_limitations", energy_level: "high", grooming: "medium", description: "Um dos cães mais populares do mundo. Extremamente dócil, inteligente e ótimo com crianças. Precisa de exercício diário.", traits: ["Dócil", "Inteligente", "Leal", "Enérgico"], photo_url: null },
+  { name: "Labrador Retriever", size: "large", good_with_kids: true, apartment_friendly: "with_limitations", energy_level: "high", grooming: "low", description: "Versátil e amigável. Excelente cão de família, precisa de bastante atividade física. Adora água.", traits: ["Amigável", "Ativo", "Obediente", "Versátil"], photo_url: null },
+  { name: "Pastor Alemão", size: "large", good_with_kids: true, apartment_friendly: "no", energy_level: "high", grooming: "medium", description: "Inteligente, leal e protetor. Excelente cão de trabalho e guarda. Precisa de espaço e treinamento consistente.", traits: ["Inteligente", "Protetor", "Corajoso", "Leal"], photo_url: null },
+  { name: "Malinois", size: "large", good_with_kids: false, apartment_friendly: "no", energy_level: "high", grooming: "low", description: "Cão de trabalho por excelência. Energia extrema, precisa de dono experiente. Não recomendado para iniciantes.", traits: ["Atlético", "Focado", "Intenso", "Trabalhador"], photo_url: null },
+  { name: "Bulldog Francês", size: "small", good_with_kids: true, apartment_friendly: "yes", energy_level: "low", grooming: "low", description: "Companheiro perfeito para apartamento. Baixa energia, muito afetuoso. Atenção à saúde respiratória.", traits: ["Afetuoso", "Calmo", "Divertido", "Companheiro"], photo_url: null },
+  { name: "Pug", size: "small", good_with_kids: true, apartment_friendly: "yes", energy_level: "low", grooming: "low", description: "Expressivo e encantador. Ótimo para famílias e apartamentos. Sensível ao calor. Personalidade única.", traits: ["Expressivo", "Carinhoso", "Engraçado", "Sociável"], photo_url: null },
+  { name: "Border Collie", size: "medium", good_with_kids: true, apartment_friendly: "no", energy_level: "high", grooming: "medium", description: "O cão mais inteligente do mundo. Precisa de estímulo mental constante e muito exercício. Ideal para casas com quintal.", traits: ["Inteligente", "Ágil", "Obediente", "Enérgico"], photo_url: null },
+  { name: "Yorkshire Terrier", size: "small", good_with_kids: false, apartment_friendly: "yes", energy_level: "medium", grooming: "high", description: "Pequeno mas cheio de personalidade. Corajoso e determinado. Pelo longo precisa de cuidados constantes.", traits: ["Corajoso", "Determinado", "Elegante", "Alerta"], photo_url: null },
+  { name: "Poodle", size: "medium", good_with_kids: true, apartment_friendly: "yes", energy_level: "medium", grooming: "high", description: "Um dos cães mais inteligentes. Disponível em vários tamanhos. Hipoalergênico e muito versátil.", traits: ["Inteligente", "Elegante", "Hipoalergênico", "Ativo"], photo_url: null },
+  { name: "Rottweiler", size: "giant", good_with_kids: true, apartment_friendly: "no", energy_level: "medium", grooming: "low", description: "Forte e confiante. Excelente guardião da família. Precisa de socialização precoce e treinamento firme.", traits: ["Protetor", "Confiante", "Leal", "Calmo"], photo_url: null },
+  { name: "Spitz Alemão", size: "small", good_with_kids: true, apartment_friendly: "yes", energy_level: "medium", grooming: "high", description: "Peludo e encantador. Alerta e vocalizado, ótimo cão de companhia. Adapta-se bem a apartamentos.", traits: ["Alerta", "Vivo", "Fofo", "Leal"], photo_url: null },
+];
+
+export const mockFeedPosts: FeedPost[] = [
+  { id: "f1", author_id: "u10", author_name: "Camila S.", author_avatar: null, author_role: "client", kennel_id: null, kennel_name: null, kennel_plan: null, breed_tag: "Shih Tzu", media_url: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600", media_type: "photo", caption: "Meu pequeno Thor já completou 3 meses! Obrigada Canil Rossetti pela experiência incrível 🐾", likes_count: 42, comments_count: 8, is_sponsored: false, created_at: "2026-04-05T10:30:00Z" },
+  { id: "f2", author_id: "u1", author_name: "Canil Rossetti", author_avatar: null, author_role: "kennel", kennel_id: "1", kennel_name: "Canil Rossetti", kennel_plan: "super_premium", breed_tag: "Shih Tzu", media_url: "https://images.unsplash.com/photo-1583337130417-13104dec14a7?w=600", media_type: "photo", caption: "Nova ninhada de Shih Tzus nasceu esta semana! Todos saudáveis e já com acompanhamento veterinário. Filhotes estarão disponíveis em 60 dias.", likes_count: 89, comments_count: 15, is_sponsored: true, created_at: "2026-04-04T14:00:00Z" },
+  { id: "f3", author_id: "u12", author_name: "Fernanda L.", author_avatar: null, author_role: "client", kennel_id: null, kennel_name: null, kennel_plan: null, breed_tag: "Golden Retriever", media_url: "https://images.unsplash.com/photo-1633722715463-d30f4f325e24?w=600", media_type: "photo", caption: "Primeiro banho da Nina! Golden mais linda do mundo, direto do Canil Estrela do Sul ⭐", likes_count: 67, comments_count: 12, is_sponsored: false, created_at: "2026-04-04T09:15:00Z" },
+  { id: "f4", author_id: "u3", author_name: "Von Falkenberg", author_avatar: null, author_role: "kennel", kennel_id: "3", kennel_name: "Von Falkenberg", kennel_plan: "premium", breed_tag: "Pastor Alemão", media_url: "https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=600", media_type: "photo", caption: "Rex em sessão de treino de obediência. 18 anos formando cães equilibrados e saudáveis.", likes_count: 55, comments_count: 7, is_sponsored: false, created_at: "2026-04-03T16:45:00Z" },
+  { id: "f5", author_id: "u20", author_name: "Marcos V.", author_avatar: null, author_role: "client", kennel_id: null, kennel_name: null, kennel_plan: null, breed_tag: "Bulldog Francês", media_url: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600", media_type: "photo", caption: "Duke Jr descansando depois de um longo dia de... absolutamente nada 😂 Obrigado Terra Dourada!", likes_count: 103, comments_count: 22, is_sponsored: false, created_at: "2026-04-03T11:20:00Z" },
+  { id: "f6", author_id: "u1", author_name: "Canil Rossetti", author_avatar: null, author_role: "kennel", kennel_id: "1", kennel_name: "Canil Rossetti", kennel_plan: "super_premium", breed_tag: "Maltês", media_url: "https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=600", media_type: "photo", caption: "Dia de banho e tosa na maternidade! Nossas mamães Maltês recebem cuidados premium durante toda a gestação.", likes_count: 71, comments_count: 9, is_sponsored: true, created_at: "2026-04-02T13:00:00Z" },
+  { id: "f7", author_id: "u25", author_name: "Ana Clara R.", author_avatar: null, author_role: "client", kennel_id: null, kennel_name: null, kennel_plan: null, breed_tag: "Labrador Retriever", media_url: "https://images.unsplash.com/photo-1591769225440-811ad7d6eab3?w=600", media_type: "photo", caption: "1 ano do nosso Lab! De filhote a melhor amigo da família. Valeu cada centavo investir em procedência.", likes_count: 88, comments_count: 14, is_sponsored: false, created_at: "2026-04-01T08:00:00Z" },
+];
+
+export const mockVetRecommendations: VetRecommendation[] = [
+  { id: "v1", kennel_id: "1", name: "Dr. Ricardo Almeida", specialty: "Clínico geral e reprodução", city: "Itapecerica da Serra", state: "SP", phone: "(11) 99888-0001", note: "Nosso veterinário de confiança há 20 anos. Acompanha todas as gestações e faz os check-ups dos filhotes." },
+  { id: "v2", kennel_id: "1", name: "Dra. Marina Santos", specialty: "Ortopedia e displasia", city: "São Paulo", state: "SP", phone: "(11) 99888-0002", note: "Especialista em exames de displasia. Todos os nossos reprodutores são avaliados por ela." },
+];
+
+export const mockFoodRecommendations: FoodStoreRecommendation[] = [
+  { id: "fs1", kennel_id: "1", name: "PetShop Nutrição Total", city: "Itapecerica da Serra", state: "SP", phone: "(11) 99777-0001", discount_info: "10% de desconto mencionando Canil Rossetti", note: "Trabalham com rações super premium: Royal Canin, Farmina e Guabi Natural. Entrega grátis na região." },
+  { id: "fs2", kennel_id: "1", name: "Casa de Ração do Sítio", city: "Embu das Artes", state: "SP", phone: "(11) 99777-0002", discount_info: "Primeira compra com 15% off usando código ROSSETTI15", note: "Fornecedor de ração a granel com ótimo custo-benefício. Parceiro há mais de 10 anos." },
+];

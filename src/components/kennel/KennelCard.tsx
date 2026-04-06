@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Star, MapPin, CheckCircle2, Clock, PawPrint } from "lucide-react";
+import { Star, MapPin, CheckCircle2, Clock, PawPrint, Gem, Sparkles } from "lucide-react";
 import type { Kennel } from "@/types";
 
 interface KennelCardProps {
@@ -44,8 +44,14 @@ export default function KennelCard({ kennel }: KennelCardProps) {
             </span>
             {kennel.plan === "premium" && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-600 text-white">
-                <Star className="w-2.5 h-2.5" />
+                <Sparkles className="w-2.5 h-2.5" />
                 Premium
+              </span>
+            )}
+            {kennel.plan === "super_premium" && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-brand-600 to-brand-500 text-white">
+                <Gem className="w-2.5 h-2.5" />
+                Elite
               </span>
             )}
           </div>

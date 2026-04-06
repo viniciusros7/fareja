@@ -18,6 +18,7 @@ create table public.profiles (
   full_name text not null default '',
   avatar_url text,
   role text not null default 'client' check (role in ('client', 'kennel', 'admin')),
+  pet_status text not null default 'not_specified' check (pet_status in ('pet_parent', 'looking_first', 'not_specified')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -41,7 +42,7 @@ create table public.kennels (
   years_active integer not null default 0,
   kc_registry text not null,
   kc_entity text not null default 'CBKC',
-  plan text not null default 'basic' check (plan in ('basic', 'premium')),
+  plan text not null default 'basic' check (plan in ('basic', 'premium', 'super_premium')),
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected', 'suspended')),
   verified_at timestamptz,
   breeds text[] not null default '{}',
@@ -143,6 +144,47 @@ create table public.favorites (
   kennel_id uuid references public.kennels(id) on delete cascade not null,
   created_at timestamptz not null default now(),
   primary key (user_id, kennel_id)
+);
+
+-- Recomendações de veterinários (Super Premium)
+create table public.vet_recommendations (
+  id uuid primary key default uuid_generate_v4(),
+  kennel_id uuid references public.kennels(id) on delete cascade not null,
+  name text not null,
+  specialty text not null default '',
+  city text not null,
+  state text not null,
+  phone text not null,
+  note text not null default '',
+  created_at timestamptz not null default now()
+);
+
+-- Recomendações de casas de ração (Super Premium)
+create table public.food_recommendations (
+  id uuid primary key default uuid_generate_v4(),
+  kennel_id uuid references public.kennels(id) on delete cascade not null,
+  name text not null,
+  city text not null,
+  state text not null,
+  phone text not null,
+  discount_info text,
+  note text not null default '',
+  created_at timestamptz not null default now()
+);
+
+-- Feed posts (fotos e vídeos estilo Instagram)
+create table public.feed_posts (
+  id uuid primary key default uuid_generate_v4(),
+  author_id uuid references public.profiles(id) on delete cascade not null,
+  kennel_id uuid references public.kennels(id) on delete set null,
+  breed_tag text not null,
+  media_url text,
+  media_type text check (media_type in ('photo', 'video')),
+  caption text not null default '',
+  likes_count integer not null default 0,
+  comments_count integer not null default 0,
+  is_sponsored boolean not null default false,
+  created_at timestamptz not null default now()
 );
 
 -- ============================================================

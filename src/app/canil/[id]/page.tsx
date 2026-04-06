@@ -5,9 +5,10 @@ import Link from "next/link";
 import {
   ArrowLeft, Star, MapPin, CheckCircle2, Phone, Mail,
   AtSign, Globe, PawPrint, Dna, Syringe, ShieldCheck,
-  Home, Heart, Clock, ExternalLink, Sparkles,
+  Home, Heart, Clock, ExternalLink, Sparkles, Gem,
+  Stethoscope, Store,
 } from "lucide-react";
-import { mockKennels, mockReviews } from "@/lib/mock-data";
+import { mockKennels, mockReviews, mockVetRecommendations, mockFoodRecommendations } from "@/lib/mock-data";
 
 export default function KennelDetailPage() {
   const params = useParams();
@@ -80,6 +81,12 @@ export default function KennelDetailPage() {
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-brand-600 text-white">
                 <Sparkles className="w-2.5 h-2.5" />
                 Premium
+              </span>
+            )}
+            {kennel.plan === "super_premium" && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-sm">
+                <Gem className="w-2.5 h-2.5" />
+                Elite
               </span>
             )}
           </div>
@@ -256,6 +263,87 @@ export default function KennelDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Vet Recommendations (Super Premium) */}
+      {kennel.plan === "super_premium" && (() => {
+        const vets = mockVetRecommendations.filter((v) => v.kennel_id === kennel.id);
+        if (vets.length === 0) return null;
+        return (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <h2 className="text-xs font-semibold text-earth-400 uppercase tracking-wider">
+                Veterinários recomendados
+              </h2>
+              <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-gradient-to-r from-brand-600 to-brand-500 text-white">
+                Elite
+              </span>
+            </div>
+            <div className="space-y-3">
+              {vets.map((v) => (
+                <div key={v.id} className="p-4 rounded-xl border border-earth-200 bg-white">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+                      <Stethoscope className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-semibold text-earth-800">{v.name}</div>
+                      <div className="text-[11px] text-earth-500">{v.specialty} · {v.city}, {v.state}</div>
+                      <p className="text-xs text-earth-500 mt-1.5 leading-relaxed">{v.note}</p>
+                      <a href={`tel:${v.phone}`} className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-brand-600 hover:text-brand-700">
+                        <Phone className="w-3 h-3" />
+                        {v.phone}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Food Store Recommendations (Super Premium) */}
+      {kennel.plan === "super_premium" && (() => {
+        const stores = mockFoodRecommendations.filter((s) => s.kennel_id === kennel.id);
+        if (stores.length === 0) return null;
+        return (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <h2 className="text-xs font-semibold text-earth-400 uppercase tracking-wider">
+                Casas de ração recomendadas
+              </h2>
+              <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-gradient-to-r from-brand-600 to-brand-500 text-white">
+                Elite
+              </span>
+            </div>
+            <div className="space-y-3">
+              {stores.map((s) => (
+                <div key={s.id} className="p-4 rounded-xl border border-earth-200 bg-white">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-forest-50 text-forest-500 flex items-center justify-center shrink-0">
+                      <Store className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-semibold text-earth-800">{s.name}</div>
+                      <div className="text-[11px] text-earth-500">{s.city}, {s.state}</div>
+                      {s.discount_info && (
+                        <div className="mt-1.5 px-2.5 py-1 rounded-lg bg-forest-50 text-forest-700 text-[11px] font-medium inline-block">
+                          🏷️ {s.discount_info}
+                        </div>
+                      )}
+                      <p className="text-xs text-earth-500 mt-1.5 leading-relaxed">{s.note}</p>
+                      <a href={`tel:${s.phone}`} className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-brand-600 hover:text-brand-700">
+                        <Phone className="w-3 h-3" />
+                        {s.phone}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Contact CTA */}
       <div className="sticky bottom-4 bg-white/90 backdrop-blur-md border border-earth-200 rounded-2xl p-4 shadow-lg shadow-earth-900/5">

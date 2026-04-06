@@ -4,10 +4,70 @@
 
 // ---- Enums ----
 export type UserRole = "client" | "kennel" | "admin";
-export type KennelPlan = "basic" | "premium";
+export type KennelPlan = "basic" | "premium" | "super_premium";
 export type KennelStatus = "pending" | "approved" | "rejected" | "suspended";
 export type PuppyStatus = "available" | "reserved" | "sold" | "upcoming";
-export type PostType = "question" | "experience" | "article" | "tip";
+export type PostType = "question" | "experience" | "article" | "tip" | "photo" | "video";
+
+export type UserPetStatus = "pet_parent" | "looking_first" | "not_specified";
+export type DogSize = "small" | "medium" | "large" | "giant";
+export type ApartmentFit = "yes" | "no" | "with_limitations";
+
+// ---- Guia de raças ----
+export interface BreedGuide {
+  name: string;
+  size: DogSize;
+  good_with_kids: boolean;
+  apartment_friendly: ApartmentFit;
+  energy_level: "low" | "medium" | "high";
+  grooming: "low" | "medium" | "high";
+  description: string;
+  traits: string[];
+  photo_url: string | null;
+}
+
+// ---- Recomendações (Super Premium) ----
+export interface VetRecommendation {
+  id: string;
+  kennel_id: string;
+  name: string;
+  specialty: string;
+  city: string;
+  state: string;
+  phone: string;
+  note: string;
+}
+
+export interface FoodStoreRecommendation {
+  id: string;
+  kennel_id: string;
+  name: string;
+  city: string;
+  state: string;
+  phone: string;
+  discount_info: string;
+  note: string;
+}
+
+// ---- Feed ----
+export interface FeedPost {
+  id: string;
+  author_id: string;
+  author_name: string;
+  author_avatar: string | null;
+  author_role: UserRole;
+  kennel_id: string | null;
+  kennel_name: string | null;
+  kennel_plan: KennelPlan | null;
+  breed_tag: string;
+  media_url: string | null;
+  media_type: "photo" | "video" | null;
+  caption: string;
+  likes_count: number;
+  comments_count: number;
+  is_sponsored: boolean;
+  created_at: string;
+}
 
 // ---- Usuários ----
 export interface User {
@@ -17,6 +77,7 @@ export interface User {
   full_name: string;
   avatar_url: string | null;
   role: UserRole;
+  pet_status: UserPetStatus;
   created_at: string;
 }
 
