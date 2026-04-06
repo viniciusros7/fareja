@@ -4,26 +4,26 @@ export const mockKennels: (Kennel & { puppies: Puppy[]; breeders: Breeder[] })[]
   {
     id: "1",
     owner_id: "u1",
-    name: "Canil Rossetti",
-    slug: "canil-rossetti",
+    name: "Canil Good Leisure",
+    slug: "canil-good-leisure",
     description:
-      "35 anos de tradição na criação de raças toy. O canil mais antigo em atividade contínua na região de São Paulo, com foco em saúde, temperamento e conformação com o padrão da raça. Nossos reprodutores são campeões nacionais com testes genéticos completos. Filhotes entregues com 60 dias, microchipados, vacinados e com pedigree CBKC.",
-    city: "Itapecerica da Serra",
+      "Criamos com amor desde 1988. Com mais de 37 anos de experiência, somos referência na criação de Golden Retrievers e Beagles em São Paulo. Nossos cuidadores, Fábio e Marli, dedicam a vida a garantir filhotes saudáveis, bem socializados e com genética de excelência. Todos os reprodutores possuem testes completos de displasia, cardíacos e oftalmológicos. Filhotes entregues com 60 dias, microchipados, vacinados e com pedigree CBKC.",
+    city: "São Lourenço da Serra",
     state: "SP",
     address: null,
     phone: "(11) 99999-0001",
-    email: "contato@canilrossetti.com.br",
-    instagram: "@canilrossetti",
-    website: "https://canilrossetti.com.br",
+    email: "contato@canilgoodleisure.com.br",
+    instagram: "@canilgoodleisure",
+    website: null,
     logo_url: null,
     cover_url: null,
-    years_active: 35,
+    years_active: 37,
     kc_registry: "CBKC #1204",
     kc_entity: "CBKC",
     plan: "super_premium",
     status: "approved",
     verified_at: "2026-01-15T00:00:00Z",
-    breeds: ["Shih Tzu", "Lhasa Apso", "Maltês"],
+    breeds: ["Golden Retriever", "Beagle"],
     facilities_approved: true,
     microchip: true,
     vaccines: true,
@@ -36,14 +36,16 @@ export const mockKennels: (Kennel & { puppies: Puppy[]; breeders: Breeder[] })[]
     created_at: "2025-06-01T00:00:00Z",
     updated_at: "2026-04-01T00:00:00Z",
     breeders: [
-      { id: "b1", kennel_id: "1", name: "Imperador", breed: "Shih Tzu", sex: "male", registry: "LOF BR-15672", titles: "Multi CH BR, Grand CH", photo_url: null, health_tests: ["Displasia", "Patela", "Cardíaco", "Oftalmológico"], born_at: "2020-03-10" },
-      { id: "b2", kennel_id: "1", name: "Princesa", breed: "Shih Tzu", sex: "female", registry: "LOF BR-18901", titles: "CH BR, Best of Breed", photo_url: null, health_tests: ["Displasia", "Patela", "Cardíaco"], born_at: "2021-07-22" },
+      { id: "b1", kennel_id: "1", name: "Zeus", breed: "Golden Retriever", sex: "male", registry: "LOF BR-15672", titles: "Multi CH BR, Grand CH", photo_url: null, health_tests: ["Displasia quadril A", "Displasia cotovelo 0", "Cardíaco", "Oftalmológico", "DNA PRA"], born_at: "2020-03-10" },
+      { id: "b2", kennel_id: "1", name: "Mel", breed: "Golden Retriever", sex: "female", registry: "LOF BR-18901", titles: "CH BR, Best of Breed", photo_url: null, health_tests: ["Displasia quadril A", "Cardíaco", "Oftalmológico"], born_at: "2021-07-22" },
+      { id: "b9", kennel_id: "1", name: "Snoopy", breed: "Beagle", sex: "male", registry: "LOF BR-20345", titles: "CH BR", photo_url: null, health_tests: ["MLS", "Cardíaco", "NCCD"], born_at: "2021-01-15" },
+      { id: "b10", kennel_id: "1", name: "Nina", breed: "Beagle", sex: "female", registry: "LOF BR-21567", titles: "Excelente", photo_url: null, health_tests: ["MLS", "Cardíaco"], born_at: "2022-04-20" },
     ],
     puppies: [
-      { id: "p1", kennel_id: "1", name: "Fêmea 1 – Shih Tzu", breed: "Shih Tzu", sex: "female", born_at: "2026-01-20", expected_at: null, price: 4000, status: "available", father_id: "b1", mother_id: "b2", photo_url: null, microchipped: true, vaccinated: true, description: "Pelagem branca e dourada, temperamento dócil" },
-      { id: "p2", kennel_id: "1", name: "Macho 1 – Shih Tzu", breed: "Shih Tzu", sex: "male", born_at: "2026-01-20", expected_at: null, price: 3500, status: "available", father_id: "b1", mother_id: "b2", photo_url: null, microchipped: true, vaccinated: true, description: "Pelagem tricolor, muito brincalhão" },
-      { id: "p3", kennel_id: "1", name: "Fêmea 2 – Maltês", breed: "Maltês", sex: "female", born_at: "2026-02-10", expected_at: null, price: 5000, status: "available", father_id: null, mother_id: null, photo_url: null, microchipped: true, vaccinated: true, description: "Pelagem branca pura, porte miniatura" },
-      { id: "p4", kennel_id: "1", name: "Macho 2 – Lhasa Apso", breed: "Lhasa Apso", sex: "male", born_at: null, expected_at: "2026-06-15", price: 3000, status: "upcoming", father_id: null, mother_id: null, photo_url: null, microchipped: false, vaccinated: false, description: "Previsão para junho/2026" },
+      { id: "p1", kennel_id: "1", name: "Macho 1 – Golden", breed: "Golden Retriever", sex: "male", born_at: "2026-02-10", expected_at: null, price: 5500, status: "available", father_id: "b1", mother_id: "b2", photo_url: null, microchipped: true, vaccinated: true, description: "Pelagem dourada clara, temperamento equilibrado e dócil" },
+      { id: "p2", kennel_id: "1", name: "Fêmea 1 – Golden", breed: "Golden Retriever", sex: "female", born_at: "2026-02-10", expected_at: null, price: 6000, status: "available", father_id: "b1", mother_id: "b2", photo_url: null, microchipped: true, vaccinated: true, description: "Pelagem dourada escura, muito brincalhona" },
+      { id: "p3", kennel_id: "1", name: "Macho 1 – Beagle", breed: "Beagle", sex: "male", born_at: "2026-03-05", expected_at: null, price: 4000, status: "available", father_id: "b9", mother_id: "b10", photo_url: null, microchipped: true, vaccinated: true, description: "Tricolor clássico, muito ativo e curioso" },
+      { id: "p4", kennel_id: "1", name: "Fêmea 2 – Golden", breed: "Golden Retriever", sex: "female", born_at: null, expected_at: "2026-06-15", price: 5500, status: "upcoming", father_id: null, mother_id: null, photo_url: null, microchipped: false, vaccinated: false, description: "Previsão para junho/2026 – lista de espera aberta" },
     ],
   },
   {
@@ -178,23 +180,24 @@ export const mockKennels: (Kennel & { puppies: Puppy[]; breeders: Breeder[] })[]
 ];
 
 export const mockReviews: (Review & { user_name: string; user_avatar: string | null })[] = [
-  { id: "r1", kennel_id: "1", user_id: "u10", user_name: "Camila S.", user_avatar: null, rating: 5, comment: "Comprei meu Shih Tzu no Canil Rossetti e a experiência foi impecável. O filhote chegou saudável, vacinado e microchipado. A família é muito atenciosa e transparente.", source: "fareja", created_at: "2026-03-15T00:00:00Z" },
-  { id: "r2", kennel_id: "1", user_id: "u11", user_name: "Roberto M.", user_avatar: null, rating: 5, comment: "35 anos de experiência fazem diferença. Meu Lhasa Apso é perfeito e veio com toda documentação. Recomendo demais!", source: "fareja", created_at: "2026-02-20T00:00:00Z" },
+  { id: "r1", kennel_id: "1", user_id: "u10", user_name: "Camila S.", user_avatar: null, rating: 5, comment: "Comprei meu Golden Retriever no Canil Good Leisure e a experiência foi impecável. O filhote chegou saudável, vacinado e microchipado. Fábio e Marli são muito atenciosos e transparentes.", source: "fareja", created_at: "2026-03-15T00:00:00Z" },
+  { id: "r2", kennel_id: "1", user_id: "u11", user_name: "Roberto M.", user_avatar: null, rating: 5, comment: "37 anos de experiência fazem diferença. Meu Beagle é perfeito e veio com toda documentação. Fábio e Marli são referência!", source: "fareja", created_at: "2026-02-20T00:00:00Z" },
   { id: "r3", kennel_id: "2", user_id: "u12", user_name: "Fernanda L.", user_avatar: null, rating: 5, comment: "Golden Retriever lindo e saudável! Thor e Luna são reprodutores incríveis. O canil é organizado e limpo.", source: "fareja", created_at: "2026-03-01T00:00:00Z" },
 ];
 
 export const mockPosts: Post[] = [
-  { id: "post1", author_id: "u10", author_name: "Camila S.", author_avatar: null, author_role: "client", kennel_id: null, kennel_name: null, type: "experience", title: "Minha experiência comprando um Shih Tzu na Fareja", content: "Depois de meses pesquisando, encontrei o Canil Rossetti pela Fareja. A diferença de comprar de um canil verificado é enorme. Recebi toda documentação, pedigree e o filhote já microchipado. Hoje meu Thor tem 3 meses e está super saudável!", image_url: null, likes_count: 24, comments_count: 8, created_at: "2026-03-20T00:00:00Z" },
-  { id: "post2", author_id: "u1", author_name: "Canil Rossetti", author_avatar: null, author_role: "kennel", kennel_id: "1", kennel_name: "Canil Rossetti", type: "tip", title: "5 sinais de um criador responsável", content: "1. Registro oficial no Kennel Club\n2. Testes genéticos dos reprodutores\n3. Filhotes microchipados\n4. Instalações limpas e espaçosas\n5. Não entrega filhotes antes dos 45-60 dias\n\nSe o criador não atende esses requisitos, desconfie!", image_url: null, likes_count: 56, comments_count: 12, created_at: "2026-03-18T00:00:00Z" },
+  { id: "post1", author_id: "u10", author_name: "Camila S.", author_avatar: null, author_role: "client", kennel_id: null, kennel_name: null, type: "experience", title: "Minha experiência comprando um Golden na Fareja", content: "Depois de meses pesquisando, encontrei o Canil Good Leisure pela Fareja. A diferença de comprar de um canil verificado é enorme. Recebi toda documentação, pedigree e o filhote já microchipado. Hoje meu Thor tem 3 meses e está super saudável!", image_url: null, likes_count: 24, comments_count: 8, created_at: "2026-03-20T00:00:00Z" },
+  { id: "post2", author_id: "u1", author_name: "Canil Good Leisure", author_avatar: null, author_role: "kennel", kennel_id: "1", kennel_name: "Canil Good Leisure", type: "tip", title: "5 sinais de um criador responsável", content: "1. Registro oficial no Kennel Club\n2. Testes genéticos dos reprodutores\n3. Filhotes microchipados\n4. Instalações limpas e espaçosas\n5. Não entrega filhotes antes dos 45-60 dias\n\nSe o criador não atende esses requisitos, desconfie!", image_url: null, likes_count: 56, comments_count: 12, created_at: "2026-03-18T00:00:00Z" },
   { id: "post3", author_id: "u15", author_name: "Lucas P.", author_avatar: null, author_role: "client", kennel_id: null, kennel_name: null, type: "question", title: "Golden Retriever ou Labrador para apartamento?", content: "Moro em apartamento de 70m² e trabalho home office. Estou entre Golden e Labrador. Alguém tem experiência com essas raças em apartamento? O prédio aceita cães de grande porte.", image_url: null, likes_count: 15, comments_count: 23, created_at: "2026-03-22T00:00:00Z" },
 ];
 
 export const allBreeds = [
+  "Golden Retriever",
+  "Beagle",
+  "Labrador Retriever",
   "Shih Tzu",
   "Lhasa Apso",
   "Maltês",
-  "Golden Retriever",
-  "Labrador Retriever",
   "Pastor Alemão",
   "Malinois",
   "Bulldog Francês",
@@ -208,6 +211,7 @@ export const breedGuide: BreedGuide[] = [
   { name: "Lhasa Apso", size: "small", good_with_kids: true, apartment_friendly: "yes", energy_level: "medium", grooming: "high", description: "Independente mas leal. Excelente cão de alerta, adapta-se muito bem a espaços menores.", traits: ["Leal", "Alerta", "Independente", "Corajoso"], photo_url: null },
   { name: "Maltês", size: "small", good_with_kids: true, apartment_friendly: "yes", energy_level: "medium", grooming: "high", description: "Elegante e brincalhão. Não solta pelo, ótimo para pessoas alérgicas. Muito apegado ao dono.", traits: ["Elegante", "Brincalhão", "Hipoalergênico", "Sociável"], photo_url: null },
   { name: "Golden Retriever", size: "large", good_with_kids: true, apartment_friendly: "with_limitations", energy_level: "high", grooming: "medium", description: "Um dos cães mais populares do mundo. Extremamente dócil, inteligente e ótimo com crianças. Precisa de exercício diário.", traits: ["Dócil", "Inteligente", "Leal", "Enérgico"], photo_url: null },
+  { name: "Beagle", size: "medium", good_with_kids: true, apartment_friendly: "with_limitations", energy_level: "high", grooming: "low", description: "Farejador nato, curioso e brincalhão. Ótimo com crianças e famílias ativas. Precisa de exercício e pode ser teimoso no treinamento. Companheiro fiel e alegre.", traits: ["Curioso", "Brincalhão", "Sociável", "Ativo"], photo_url: null },
   { name: "Labrador Retriever", size: "large", good_with_kids: true, apartment_friendly: "with_limitations", energy_level: "high", grooming: "low", description: "Versátil e amigável. Excelente cão de família, precisa de bastante atividade física. Adora água.", traits: ["Amigável", "Ativo", "Obediente", "Versátil"], photo_url: null },
   { name: "Pastor Alemão", size: "large", good_with_kids: true, apartment_friendly: "no", energy_level: "high", grooming: "medium", description: "Inteligente, leal e protetor. Excelente cão de trabalho e guarda. Precisa de espaço e treinamento consistente.", traits: ["Inteligente", "Protetor", "Corajoso", "Leal"], photo_url: null },
   { name: "Malinois", size: "large", good_with_kids: false, apartment_friendly: "no", energy_level: "high", grooming: "low", description: "Cão de trabalho por excelência. Energia extrema, precisa de dono experiente. Não recomendado para iniciantes.", traits: ["Atlético", "Focado", "Intenso", "Trabalhador"], photo_url: null },
@@ -221,21 +225,21 @@ export const breedGuide: BreedGuide[] = [
 ];
 
 export const mockFeedPosts: FeedPost[] = [
-  { id: "f1", author_id: "u10", author_name: "Camila S.", author_avatar: null, author_role: "client", kennel_id: null, kennel_name: null, kennel_plan: null, breed_tag: "Shih Tzu", media_url: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600", media_type: "photo", caption: "Meu pequeno Thor já completou 3 meses! Obrigada Canil Rossetti pela experiência incrível 🐾", likes_count: 42, comments_count: 8, is_sponsored: false, created_at: "2026-04-05T10:30:00Z" },
-  { id: "f2", author_id: "u1", author_name: "Canil Rossetti", author_avatar: null, author_role: "kennel", kennel_id: "1", kennel_name: "Canil Rossetti", kennel_plan: "super_premium", breed_tag: "Shih Tzu", media_url: "https://images.unsplash.com/photo-1583337130417-13104dec14a7?w=600", media_type: "photo", caption: "Nova ninhada de Shih Tzus nasceu esta semana! Todos saudáveis e já com acompanhamento veterinário. Filhotes estarão disponíveis em 60 dias.", likes_count: 89, comments_count: 15, is_sponsored: true, created_at: "2026-04-04T14:00:00Z" },
+  { id: "f1", author_id: "u10", author_name: "Camila S.", author_avatar: null, author_role: "client", kennel_id: null, kennel_name: null, kennel_plan: null, breed_tag: "Golden Retriever", media_url: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600", media_type: "photo", caption: "Meu pequeno Thor já completou 3 meses! Obrigada Canil Good Leisure pela experiência incrível 🐾", likes_count: 42, comments_count: 8, is_sponsored: false, created_at: "2026-04-05T10:30:00Z" },
+  { id: "f2", author_id: "u1", author_name: "Canil Good Leisure", author_avatar: null, author_role: "kennel", kennel_id: "1", kennel_name: "Canil Good Leisure", kennel_plan: "super_premium", breed_tag: "Golden Retriever", media_url: "https://images.unsplash.com/photo-1583337130417-13104dec14a7?w=600", media_type: "photo", caption: "Nova ninhada de Goldens nasceu esta semana! Todos saudáveis e já com acompanhamento veterinário. Filhotes estarão disponíveis em 60 dias.", likes_count: 89, comments_count: 15, is_sponsored: true, created_at: "2026-04-04T14:00:00Z" },
   { id: "f3", author_id: "u12", author_name: "Fernanda L.", author_avatar: null, author_role: "client", kennel_id: null, kennel_name: null, kennel_plan: null, breed_tag: "Golden Retriever", media_url: "https://images.unsplash.com/photo-1633722715463-d30f4f325e24?w=600", media_type: "photo", caption: "Primeiro banho da Nina! Golden mais linda do mundo, direto do Canil Estrela do Sul ⭐", likes_count: 67, comments_count: 12, is_sponsored: false, created_at: "2026-04-04T09:15:00Z" },
   { id: "f4", author_id: "u3", author_name: "Von Falkenberg", author_avatar: null, author_role: "kennel", kennel_id: "3", kennel_name: "Von Falkenberg", kennel_plan: "premium", breed_tag: "Pastor Alemão", media_url: "https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=600", media_type: "photo", caption: "Rex em sessão de treino de obediência. 18 anos formando cães equilibrados e saudáveis.", likes_count: 55, comments_count: 7, is_sponsored: false, created_at: "2026-04-03T16:45:00Z" },
   { id: "f5", author_id: "u20", author_name: "Marcos V.", author_avatar: null, author_role: "client", kennel_id: null, kennel_name: null, kennel_plan: null, breed_tag: "Bulldog Francês", media_url: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600", media_type: "photo", caption: "Duke Jr descansando depois de um longo dia de... absolutamente nada 😂 Obrigado Terra Dourada!", likes_count: 103, comments_count: 22, is_sponsored: false, created_at: "2026-04-03T11:20:00Z" },
-  { id: "f6", author_id: "u1", author_name: "Canil Rossetti", author_avatar: null, author_role: "kennel", kennel_id: "1", kennel_name: "Canil Rossetti", kennel_plan: "super_premium", breed_tag: "Maltês", media_url: "https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=600", media_type: "photo", caption: "Dia de banho e tosa na maternidade! Nossas mamães Maltês recebem cuidados premium durante toda a gestação.", likes_count: 71, comments_count: 9, is_sponsored: true, created_at: "2026-04-02T13:00:00Z" },
+  { id: "f6", author_id: "u1", author_name: "Canil Good Leisure", author_avatar: null, author_role: "kennel", kennel_id: "1", kennel_name: "Canil Good Leisure", kennel_plan: "super_premium", breed_tag: "Beagle", media_url: "https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=600", media_type: "photo", caption: "Nossos Beagles em dia de brincadeira no campo! Socialização desde filhotes é essencial para o temperamento.", likes_count: 71, comments_count: 9, is_sponsored: true, created_at: "2026-04-02T13:00:00Z" },
   { id: "f7", author_id: "u25", author_name: "Ana Clara R.", author_avatar: null, author_role: "client", kennel_id: null, kennel_name: null, kennel_plan: null, breed_tag: "Labrador Retriever", media_url: "https://images.unsplash.com/photo-1591769225440-811ad7d6eab3?w=600", media_type: "photo", caption: "1 ano do nosso Lab! De filhote a melhor amigo da família. Valeu cada centavo investir em procedência.", likes_count: 88, comments_count: 14, is_sponsored: false, created_at: "2026-04-01T08:00:00Z" },
 ];
 
 export const mockVetRecommendations: VetRecommendation[] = [
-  { id: "v1", kennel_id: "1", name: "Dr. Ricardo Almeida", specialty: "Clínico geral e reprodução", city: "Itapecerica da Serra", state: "SP", phone: "(11) 99888-0001", note: "Nosso veterinário de confiança há 20 anos. Acompanha todas as gestações e faz os check-ups dos filhotes." },
+  { id: "v1", kennel_id: "1", name: "Dr. Ricardo Almeida", specialty: "Clínico geral e reprodução", city: "São Lourenço da Serra", state: "SP", phone: "(11) 99888-0001", note: "Nosso veterinário de confiança há 20 anos. Acompanha todas as gestações e faz os check-ups dos filhotes." },
   { id: "v2", kennel_id: "1", name: "Dra. Marina Santos", specialty: "Ortopedia e displasia", city: "São Paulo", state: "SP", phone: "(11) 99888-0002", note: "Especialista em exames de displasia. Todos os nossos reprodutores são avaliados por ela." },
 ];
 
 export const mockFoodRecommendations: FoodStoreRecommendation[] = [
-  { id: "fs1", kennel_id: "1", name: "PetShop Nutrição Total", city: "Itapecerica da Serra", state: "SP", phone: "(11) 99777-0001", discount_info: "10% de desconto mencionando Canil Rossetti", note: "Trabalham com rações super premium: Royal Canin, Farmina e Guabi Natural. Entrega grátis na região." },
-  { id: "fs2", kennel_id: "1", name: "Casa de Ração do Sítio", city: "Embu das Artes", state: "SP", phone: "(11) 99777-0002", discount_info: "Primeira compra com 15% off usando código ROSSETTI15", note: "Fornecedor de ração a granel com ótimo custo-benefício. Parceiro há mais de 10 anos." },
+  { id: "fs1", kennel_id: "1", name: "PetShop Nutrição Total", city: "São Lourenço da Serra", state: "SP", phone: "(11) 99777-0001", discount_info: "10% de desconto mencionando Canil Good Leisure", note: "Trabalham com rações super premium: Royal Canin, Farmina e Guabi Natural. Entrega grátis na região." },
+  { id: "fs2", kennel_id: "1", name: "Casa de Ração do Sítio", city: "Embu das Artes", state: "SP", phone: "(11) 99777-0002", discount_info: "Primeira compra com 15% off usando código GOODLEISURE15", note: "Fornecedor de ração a granel com ótimo custo-benefício. Parceiro há mais de 10 anos." },
 ];
