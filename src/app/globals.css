@@ -1,5 +1,40 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-50: #FFF0E8;
+  --color-brand-100: #F5D8C0;
+  --color-brand-200: #E8B890;
+  --color-brand-300: #D99565;
+  --color-brand-400: #CC7A48;
+  --color-brand-500: #C26835;
+  --color-brand-600: #B85C2F;
+  --color-brand-700: #9B4D25;
+  --color-brand-800: #7A3C1C;
+  --color-brand-900: #3D1E0D;
+  --color-forest-50: #F0F7EA;
+  --color-forest-100: #D8EBCA;
+  --color-forest-200: #B5D88E;
+  --color-forest-300: #97C459;
+  --color-forest-400: #639922;
+  --color-forest-500: #3B6D11;
+  --color-forest-600: #27500A;
+  --color-forest-700: #1B3A07;
+  --color-forest-800: #112504;
+  --color-forest-900: #0A1602;
+  --color-earth-50: #FAF8F5;
+  --color-earth-100: #F2EDE5;
+  --color-earth-200: #E0D0C0;
+  --color-earth-300: #D4C7B0;
+  --color-earth-400: #B8A485;
+  --color-earth-500: #8B7355;
+  --color-earth-600: #6B563E;
+  --color-earth-700: #4D3D2B;
+  --color-earth-800: #33281C;
+  --color-earth-900: #1A0F08;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+}
+
 :root {
   --brand-primary: #B85C2F;
   --brand-light: #F5D8C0;
