@@ -117,7 +117,7 @@ export default function ParaCriadoresPage() {
             <Crown className="w-3.5 h-3.5" />
             Para criadores e canis
           </div>
-          <h1 className="font-display text-3xl sm:text-4xl font-semibold text-earth-900 tracking-tight mb-4">
+          <h1 className="font-display text-3xl sm:text-4xl font-semibold text-brand-900 tracking-tight mb-4">
             Seu canil merece ser <span className="text-brand-600">reconhecido</span>
           </h1>
           <p className="text-base text-earth-500 max-w-lg mx-auto leading-relaxed">
@@ -146,7 +146,7 @@ export default function ParaCriadoresPage() {
       <section className="bg-white border-y border-earth-200 py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="font-display text-2xl font-semibold text-earth-900 mb-2">
+            <h2 className="font-display text-2xl font-semibold text-brand-900 mb-2">
               Planos
             </h2>
             <p className="text-sm text-earth-500">
@@ -188,7 +188,7 @@ export default function ParaCriadoresPage() {
                     </div>
                   )}
 
-                  <h3 className="font-display text-lg font-semibold text-earth-900 mb-1">
+                  <h3 className="font-display text-lg font-semibold text-brand-900 mb-1">
                     {plan.name}
                   </h3>
                   <p className="text-xs text-earth-500 mb-4">{plan.description}</p>
@@ -229,7 +229,7 @@ export default function ParaCriadoresPage() {
 
           {/* Super Premium highlights */}
           <div className="mt-10 p-6 rounded-2xl bg-brand-50/50 border border-brand-200">
-            <h3 className="font-display text-lg font-semibold text-earth-900 mb-4 text-center">
+            <h3 className="font-display text-lg font-semibold text-brand-900 mb-4 text-center">
               Exclusivo do plano Elite
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -255,7 +255,7 @@ export default function ParaCriadoresPage() {
 
       {/* How it works */}
       <section className="max-w-3xl mx-auto px-4 py-16">
-        <h2 className="font-display text-2xl font-semibold text-earth-900 text-center mb-10">
+        <h2 className="font-display text-2xl font-semibold text-brand-900 text-center mb-10">
           Como funciona o cadastro
         </h2>
         <div className="space-y-6">
@@ -277,7 +277,7 @@ export default function ParaCriadoresPage() {
       <section className="max-w-xl mx-auto px-4 pb-16 text-center">
         <div className="p-8 rounded-2xl bg-gradient-to-br from-brand-100 to-brand-50 border border-brand-200">
           <PawPrint className="w-8 h-8 text-brand-600 mx-auto mb-4" />
-          <h3 className="font-display text-xl font-semibold text-earth-900 mb-2">
+          <h3 className="font-display text-xl font-semibold text-brand-900 mb-2">
             Pronto para dar o próximo passo?
           </h3>
           <p className="text-sm text-earth-500 mb-5">

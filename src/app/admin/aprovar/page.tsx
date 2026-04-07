@@ -92,7 +92,7 @@ export default function AdminAprovarPage() {
           <ShieldCheck className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="font-display text-2xl font-semibold text-earth-900">
+          <h1 className="font-display text-2xl font-semibold text-brand-900">
             Painel administrativo
           </h1>
           <p className="text-sm text-earth-500">Gerencie cadastros de canis e aprovações.</p>

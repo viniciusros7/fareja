@@ -29,7 +29,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="font-display text-xl font-semibold text-earth-900">
+            <h1 className="font-display text-xl font-semibold text-brand-900">
               Canil Good Leisure
             </h1>
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-brand-600 to-brand-500 text-white">

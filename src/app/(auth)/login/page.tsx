@@ -32,7 +32,7 @@ export default function LoginPage() {
           <div className="w-14 h-14 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center mx-auto mb-4">
             <PawPrint className="w-7 h-7" />
           </div>
-          <h1 className="font-display text-2xl font-semibold text-earth-900 mb-1">
+          <h1 className="font-display text-2xl font-semibold text-brand-900 mb-1">
             {mode === "pet_status" ? "Conte-nos sobre você" : "Entre na Fareja"}
           </h1>
           <p className="text-sm text-earth-500">

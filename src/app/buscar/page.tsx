@@ -102,7 +102,7 @@ export default function BuscarPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="font-display text-2xl font-semibold text-earth-900 mb-1">
+      <h1 className="font-display text-2xl font-semibold text-brand-900 mb-1">
         Buscar canis verificados
       </h1>
       <p className="text-sm text-earth-500 mb-6">

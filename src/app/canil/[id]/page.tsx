@@ -70,7 +70,7 @@ export default function KennelDetailPage() {
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap mb-1">
-            <h1 className="font-display text-2xl font-semibold text-earth-900">
+            <h1 className="font-display text-2xl font-semibold text-brand-900">
               {kennel.name}
             </h1>
             <span className="badge-verified">

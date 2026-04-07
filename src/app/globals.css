@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --brand-primary: #C2703E;
-  --brand-light: #F5E3D0;
+  --brand-primary: #B85C2F;
+  --brand-light: #F5D8C0;
   --forest-green: #3B6D11;
   --forest-light: #EAF3DE;
 }
 
 body {
   font-family: "DM Sans", system-ui, sans-serif;
-  background: #FDF6EE;
-  color: #2C1810;
+  background: #FFFBF5;
+  color: #1A0F08;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -50,14 +50,14 @@ body {
   border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
-  background: var(--brand-light);
-  color: var(--brand-primary);
+  background: var(--forest-light);
+  color: var(--forest-green);
 }
 
 .card-hover {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .card-hover:hover {
-  border-color: #D4C7B0;
-  box-shadow: 0 2px 12px rgba(194, 112, 62, 0.08);
+  border-color: #C8B8A0;
+  box-shadow: 0 2px 12px rgba(184, 92, 47, 0.10);
 }

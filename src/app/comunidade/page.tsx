@@ -43,7 +43,7 @@ export default function ComunidadePage() {
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-earth-900 mb-1">
+          <h1 className="font-display text-2xl font-semibold text-brand-900 mb-1">
             Comunidade
           </h1>
           <p className="text-sm text-earth-500">

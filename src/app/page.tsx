@@ -83,7 +83,7 @@ export default function HomePage() {
             Plataforma pioneira no Brasil
           </div>
 
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold text-earth-900 tracking-tight leading-[1.1] mb-5 animate-fade-in-up animate-delay-1">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold text-brand-900 tracking-tight leading-[1.1] mb-5 animate-fade-in-up animate-delay-1">
             Seu filhote merece{" "}
             <span className="text-brand-600">procedência</span>
           </h1>
@@ -129,7 +129,7 @@ export default function HomePage() {
       {/* ── Features ── */}
       <section className="max-w-5xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="font-display text-2xl sm:text-3xl font-semibold text-earth-900 mb-3">
+          <h2 className="font-display text-2xl sm:text-3xl font-semibold text-brand-900 mb-3">
             Por que a Fareja existe
           </h2>
           <p className="text-earth-500 max-w-lg mx-auto">
@@ -161,7 +161,7 @@ export default function HomePage() {
       <section className="bg-white border-y border-earth-200 py-16">
         <div className="max-w-3xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="font-display text-2xl sm:text-3xl font-semibold text-earth-900 mb-3">
+            <h2 className="font-display text-2xl sm:text-3xl font-semibold text-brand-900 mb-3">
               Como funciona
             </h2>
             <p className="text-earth-500">
@@ -196,7 +196,7 @@ export default function HomePage() {
             <div className="w-12 h-12 rounded-xl bg-brand-600 text-white flex items-center justify-center mb-5">
               <Users className="w-6 h-6" />
             </div>
-            <h3 className="font-display text-xl font-semibold text-earth-900 mb-2">
+            <h3 className="font-display text-xl font-semibold text-brand-900 mb-2">
               Comunidade Fareja
             </h3>
             <p className="text-sm text-earth-500 leading-relaxed mb-5">
@@ -217,7 +217,7 @@ export default function HomePage() {
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 text-white flex items-center justify-center mb-5">
               <AtSign className="w-6 h-6" />
             </div>
-            <h3 className="font-display text-xl font-semibold text-earth-900 mb-2">
+            <h3 className="font-display text-xl font-semibold text-brand-900 mb-2">
               Siga no Instagram
             </h3>
             <p className="text-sm text-earth-500 leading-relaxed mb-5">
@@ -243,7 +243,7 @@ export default function HomePage() {
           <BadgeCheck className="w-5 h-5" />
           Fundada por uma família com 35 anos no ramo de criação
         </div>
-        <h2 className="font-display text-2xl sm:text-3xl font-semibold text-earth-900 mb-4">
+        <h2 className="font-display text-2xl sm:text-3xl font-semibold text-brand-900 mb-4">
           Criado por quem entende de criação responsável
         </h2>
         <p className="text-earth-500 max-w-lg mx-auto leading-relaxed mb-8">
