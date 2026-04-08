@@ -176,7 +176,7 @@ export default function HomePage() {
 
       {/* ── Community CTA ── */}
       <section className="max-w-5xl mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Comunidade */}
           <div className="p-8 rounded-2xl bg-gradient-to-br from-brand-100 to-brand-50 border border-brand-200">
             <div className="w-12 h-12 rounded-xl bg-brand-600 text-white flex items-center justify-center mb-5">
@@ -194,6 +194,27 @@ export default function HomePage() {
               className="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors"
             >
               Explorar comunidade
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Encontrar raça */}
+          <div className="p-8 rounded-2xl bg-gradient-to-br from-forest-50 to-earth-50 border border-forest-200">
+            <div className="w-12 h-12 rounded-xl bg-forest-500 text-white flex items-center justify-center mb-5">
+              <HelpCircle className="w-6 h-6" />
+            </div>
+            <h3 className="font-display text-xl font-semibold text-brand-900 mb-2">
+              Qual raça combina com você?
+            </h3>
+            <p className="text-sm text-earth-500 leading-relaxed mb-5">
+              Responda 4 perguntas e descubra as raças mais compatíveis com
+              sua moradia e rotina.
+            </p>
+            <Link
+              href="/encontrar-raca"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-forest-600 hover:text-forest-700 transition-colors"
+            >
+              Fazer o quiz
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
