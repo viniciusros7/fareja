@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import {
   Search, SlidersHorizontal, X, Dog, Baby, Home as HomeIcon,
   Zap, Sparkles, ChevronDown, ChevronUp, HelpCircle, PawPrint,
@@ -216,7 +217,7 @@ export default function BuscarPage() {
 
           {/* Breed cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            {filteredGuide.map((b) => (
+            {filteredGuide.map((b, idx) => (
               <button
                 key={b.name}
                 onClick={() => {
@@ -229,8 +230,14 @@ export default function BuscarPage() {
                     : "border-earth-200 bg-white hover:border-earth-300"
                 }`}
               >
-                <div className="w-10 h-10 rounded-lg bg-earth-100 flex items-center justify-center mb-2 text-lg">
-                  🐕
+                <div className="relative w-10 h-10 rounded-lg overflow-hidden mb-2">
+                  <Image
+                    src={`https://placedog.net/40/40?id=${idx + 60}`}
+                    alt={b.name}
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                  />
                 </div>
                 <div className="text-xs font-semibold text-earth-800 mb-0.5">{b.name}</div>
                 <div className="flex flex-wrap gap-1">
