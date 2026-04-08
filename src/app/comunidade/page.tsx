@@ -5,7 +5,7 @@ import Image from "next/image";
 import {
   Heart, MessageCircle, Share2, Plus, HelpCircle,
   Lightbulb, BookOpen, Sparkles, CheckCircle2,
-  PawPrint, Filter, Image as ImageIcon,
+  PawPrint, Filter, Camera, Image as ImageIcon,
   Gem, Star, AtSign,
 } from "lucide-react";
 import { mockPosts, mockFeedPosts, allBreeds } from "@/lib/mock-data";
