@@ -6,6 +6,7 @@ import { Menu, X, Search, User, PawPrint } from "lucide-react";
 
 const navLinks = [
   { href: "/buscar", label: "Buscar canis" },
+  { href: "/encontrar-raca", label: "Encontrar raça" },
   { href: "/comunidade", label: "Comunidade" },
   { href: "/para-criadores", label: "Para criadores" },
 ];
@@ -15,7 +16,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-[#FFFBF5]/90 backdrop-blur-md border-b border-earth-200">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-4 h-12 md:h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-9 h-9 rounded-full bg-brand-100 flex items-center justify-center group-hover:bg-brand-200 transition-colors">
