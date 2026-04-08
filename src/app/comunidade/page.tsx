@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   Heart, MessageCircle, Share2, Plus, HelpCircle,
   Lightbulb, BookOpen, Sparkles, CheckCircle2,
-  PawPrint, Filter, Camera, Image as ImageIcon,
+  PawPrint, Filter, Image as ImageIcon,
   Gem, Star, AtSign,
 } from "lucide-react";
 import { mockPosts, mockFeedPosts, allBreeds } from "@/lib/mock-data";
@@ -161,12 +162,15 @@ export default function ComunidadePage() {
                     </div>
                   </div>
 
-                  {/* Image placeholder */}
-                  <div className="w-full aspect-square bg-earth-100 flex items-center justify-center relative">
-                    <div className="text-center text-earth-300">
-                      <Camera className="w-10 h-10 mx-auto mb-2" />
-                      <span className="text-xs">Foto do pet</span>
-                    </div>
+                  {/* Feed image */}
+                  <div className="relative w-full aspect-square">
+                    <Image
+                      src={`https://placedog.net/600/600?id=${post.id.replace("f", "")}`}
+                      alt={post.breed_tag}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 672px) 100vw, 672px"
+                    />
                     {/* Breed tag overlay */}
                     <div className="absolute bottom-3 left-3">
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-black/50 text-white backdrop-blur-sm">

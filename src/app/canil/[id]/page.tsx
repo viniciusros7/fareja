@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowLeft, Star, MapPin, CheckCircle2, Phone, Mail,
   AtSign, Globe, PawPrint, Dna, Syringe, ShieldCheck,
@@ -52,6 +53,9 @@ export default function KennelDetailPage() {
   const formatPrice = (v: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
+  const coverId = parseInt(kennel.id) + 40;
+  const avatarId = parseInt(kennel.id) + 50;
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
       {/* Back */}
@@ -63,10 +67,28 @@ export default function KennelDetailPage() {
         Voltar aos resultados
       </Link>
 
+      {/* Cover photo */}
+      <div className="relative h-48 w-full rounded-2xl overflow-hidden mb-6">
+        <Image
+          src={`https://placedog.net/800/300?id=${coverId}`}
+          alt={`${kennel.name} – capa`}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 768px"
+          priority
+        />
+      </div>
+
       {/* Header */}
       <div className="flex items-start gap-4 mb-6">
-        <div className="w-16 h-16 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-xl shrink-0">
-          {initials}
+        <div className="relative w-16 h-16 rounded-2xl overflow-hidden shrink-0 border-2 border-white shadow-md -mt-12">
+          <Image
+            src={`https://placedog.net/80/80?id=${avatarId}`}
+            alt={kennel.name}
+            fill
+            className="object-cover"
+            sizes="64px"
+          />
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap mb-1">
