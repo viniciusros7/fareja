@@ -13,7 +13,9 @@ import {
   Users,
   PawPrint,
   BadgeCheck,
+  HelpCircle,
 } from "lucide-react";
+import StatsCounter from "@/components/landing/StatsCounter";
 
 const features = [
   {
@@ -65,11 +67,6 @@ const steps = [
   },
 ];
 
-const stats = [
-  { value: "35+", label: "Anos de experiência familiar no ramo" },
-  { value: "100%", label: "Canis verificados individualmente" },
-  { value: "0", label: "Tolerância com criadores irregulares" },
-];
 
 export default function HomePage() {
   return (
@@ -102,27 +99,16 @@ export default function HomePage() {
               Buscar canis verificados
             </Link>
             <Link
-              href="/para-criadores"
+              href="/encontrar-raca"
               className="flex items-center gap-2 px-7 py-3.5 text-sm font-semibold text-brand-600 bg-white border border-brand-200 rounded-full hover:bg-brand-50 transition-colors"
             >
-              Sou criador
-              <ArrowRight className="w-4 h-4" />
+              <HelpCircle className="w-4 h-4" />
+              Qual raça é para mim?
             </Link>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 max-w-md mx-auto mt-14 animate-fade-in-up animate-delay-4">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="font-display text-2xl font-semibold text-brand-600">
-                  {s.value}
-                </div>
-                <div className="text-xs text-earth-400 mt-1 leading-snug">
-                  {s.label}
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Animated stats */}
+          <StatsCounter />
         </div>
       </section>
 
