@@ -7,7 +7,8 @@ import { useUser } from "@/lib/hooks/useUser";
 
 const navLinks = [
   { href: "/buscar", label: "Buscar canis" },
-  { href: "/encontrar-raca", label: "Encontrar raça" },
+  { href: "/racas", label: "Raças" },
+  { href: "/encontrar-raca", label: "Qual raça?" },
   { href: "/doacoes", label: "Doações" },
   { href: "/comunidade", label: "Comunidade" },
   { href: "/para-criadores", label: "Para criadores" },
