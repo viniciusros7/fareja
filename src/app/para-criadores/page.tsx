@@ -284,10 +284,13 @@ export default function ParaCriadoresPage() {
             Cadastre seu canil e faça parte da primeira plataforma brasileira de
             criadores verificados.
           </p>
-          <button className="inline-flex items-center gap-2 px-8 py-3.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors">
+          <Link
+            href="/para-criadores/cadastro"
+            className="inline-flex items-center gap-2 px-8 py-3.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors"
+          >
             <Zap className="w-4 h-4" />
             Cadastrar meu canil
-          </button>
+          </Link>
         </div>
       </section>
     </div>
