@@ -4,8 +4,9 @@ import { useState, useMemo } from "react";
 import Image from "next/image";
 import {
   Search, SlidersHorizontal, X, Dog, Baby, Home as HomeIcon,
-  Zap, Sparkles, ChevronDown, ChevronUp, HelpCircle, PawPrint,
+  Zap, Sparkles, ChevronDown, ChevronUp, HelpCircle, PawPrint, Lock,
 } from "lucide-react";
+import Link from "next/link";
 import KennelCard from "@/components/kennel/KennelCard";
 import { mockKennels, allBreeds, allStates, breedGuide } from "@/lib/mock-data";
 import type { DogSize, ApartmentFit } from "@/types";
@@ -406,9 +407,43 @@ export default function BuscarPage() {
 
       {/* Results */}
       <div className="space-y-3">
-        {filtered.map((kennel) => (
+        {filtered.map((kennel, idx) => (
           <KennelCard key={kennel.id} kennel={kennel} />
         ))}
+
+        {/* Blur gate after 2nd result */}
+        {filtered.length > 2 && (
+          <div className="relative">
+            <div className="space-y-3 pointer-events-none select-none">
+              {filtered.slice(2).map((kennel) => (
+                <div key={kennel.id} className="blur-sm opacity-60">
+                  <KennelCard kennel={kennel} />
+                </div>
+              ))}
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="bg-white/95 backdrop-blur-sm border border-earth-200 rounded-2xl p-6 text-center shadow-lg mx-4 max-w-sm w-full">
+                <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center mx-auto mb-3">
+                  <Lock className="w-5 h-5 text-brand-600" />
+                </div>
+                <h3 className="text-base font-semibold text-earth-900 mb-1">
+                  Cadastre-se para ver a lista completa
+                </h3>
+                <p className="text-xs text-earth-500 mb-4 leading-relaxed">
+                  Você está vendo {Math.min(filtered.length, 2)} de {filtered.length} canis verificados.
+                  Crie sua conta gratuita para acessar todos.
+                </p>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors"
+                >
+                  <PawPrint className="w-3.5 h-3.5" />
+                  Criar conta grátis
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
 
         {filtered.length === 0 && (
           <div className="text-center py-16">

@@ -7,6 +7,7 @@ import { Menu, X, Search, User, PawPrint } from "lucide-react";
 const navLinks = [
   { href: "/buscar", label: "Buscar canis" },
   { href: "/encontrar-raca", label: "Encontrar raça" },
+  { href: "/doacoes", label: "Doações" },
   { href: "/comunidade", label: "Comunidade" },
   { href: "/para-criadores", label: "Para criadores" },
 ];
