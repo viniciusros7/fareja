@@ -21,6 +21,7 @@ export interface BreedGuide {
   apartment_friendly: ApartmentFit;
   energy_level: "low" | "medium" | "high";
   grooming: "low" | "medium" | "high";
+  coat: "short" | "medium" | "long";
   description: string;
   traits: string[];
   photo_url: string | null;
