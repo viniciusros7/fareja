@@ -42,7 +42,7 @@ function LoginGate() {
           Criar conta ou entrar
         </Link>
         <p className="mt-4 text-xs text-earth-400">
-          É rápido e gratuito para tutores.
+          É rápido e gratuito para entusiastas de pet.
         </p>
       </div>
     </div>
@@ -328,7 +328,7 @@ export default function DoacoesPage() {
             Doações
           </h1>
           <p className="text-sm text-earth-500">
-            Cães disponíveis para adoção — criadores responsáveis e tutores que precisam de ajuda.
+            Cães disponíveis para adoção — criadores responsáveis e entusiastas de pet que precisam de ajuda.
           </p>
         </div>
         <button

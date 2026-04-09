@@ -11,7 +11,7 @@ interface StatItem {
 }
 
 const stats: StatItem[] = [
-  { end: 6032, suffix: "+", label: "tutores na comunidade", formatThousands: true },
+  { end: 6032, suffix: "+", label: "entusiastas de pet na comunidade", formatThousands: true },
   { end: 4, suffix: "", label: "canis verificados" },
   { end: 35, suffix: "+", label: "anos de experiência no ramo" },
 ];

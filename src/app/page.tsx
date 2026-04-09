@@ -27,19 +27,19 @@ const features = [
   {
     icon: Dna,
     title: "Testes genéticos",
-    desc: "Reprodutores com exames de DNA, displasia e testes cardíacos comprovados e documentados.",
+    desc: "Matrizes e padreadores com certificação completa de saúde e laudos documentados.",
     color: "bg-blue-50 text-blue-700",
   },
   {
     icon: Syringe,
     title: "Saúde garantida",
-    desc: "Filhotes vacinados, vermifugados e microchipados antes da entrega ao novo tutor.",
+    desc: "Filhotes vacinados, vermifugados e microchipados antes da entrega ao novo entusiasta de pet.",
     color: "bg-forest-50 text-forest-500",
   },
   {
     icon: Home,
     title: "Bem-estar animal",
-    desc: "Instalações aprovadas pelo CRMV, sem superlotação, com socialização adequada dos filhotes.",
+    desc: "Instalações aprovadas, sem superlotação, com socialização adequada dos cães.",
     color: "bg-red-50 text-red-700",
   },
 ];
@@ -48,7 +48,7 @@ const steps = [
   {
     num: "01",
     title: "Canil envia documentação",
-    desc: "Registro CBKC, fotos das instalações, laudos de saúde dos reprodutores e histórico de ninhadas.",
+    desc: "Registro do afixo (nome do canil) na Confederação de Cinofilia, fotos das instalações, laudos de saúde dos reprodutores e histórico de ninhadas.",
   },
   {
     num: "02",
@@ -63,7 +63,7 @@ const steps = [
   {
     num: "04",
     title: "Clientes encontram",
-    desc: "Busca por raça, localização, filhotes disponíveis e avaliações reais de outros tutores.",
+    desc: "Busca por raça, localização, filhotes disponíveis e avaliações reais de outros entusiastas de pet.",
   },
 ];
 
@@ -80,14 +80,18 @@ export default function HomePage() {
             Plataforma pioneira no Brasil
           </div>
 
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold text-brand-900 tracking-tight leading-[1.1] mb-5 animate-fade-in-up animate-delay-1">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold text-brand-900 tracking-tight leading-[1.1] mb-3 animate-fade-in-up animate-delay-1">
             Seu filhote merece{" "}
             <span className="text-brand-600">procedência</span>
           </h1>
 
+          <p className="text-base sm:text-lg font-medium text-brand-400 mb-5 animate-fade-in-up animate-delay-1">
+            Chega de surpresas ao escolher o seu filhote.
+          </p>
+
           <p className="text-lg text-earth-500 max-w-xl mx-auto mb-8 animate-fade-in-up animate-delay-2 leading-relaxed">
             Encontre canis verificados com registro oficial, testes de saúde e
-            instalações aprovadas. Chega de comprar no escuro.
+            instalações aprovadas.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-in-up animate-delay-3">
@@ -174,6 +178,29 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Benefit banner ── */}
+      <section className="max-w-4xl mx-auto px-4 py-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6 rounded-2xl bg-brand-100 border border-brand-200">
+          <div className="w-12 h-12 rounded-xl bg-brand-600 text-white flex items-center justify-center shrink-0">
+            <BadgeCheck className="w-6 h-6" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-display text-base font-semibold text-brand-900 mb-1">
+              Vantagem para usuários cadastrados
+            </h3>
+            <p className="text-sm text-brand-700 leading-relaxed">
+              Usuários cadastrados têm preferência na escolha de filhotes e acesso antecipado às ninhadas dos criadores verificados.
+            </p>
+          </div>
+          <Link
+            href="/login"
+            className="shrink-0 px-5 py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors"
+          >
+            Criar conta grátis
+          </Link>
+        </div>
+      </section>
+
       {/* ── Community CTA ── */}
       <section className="max-w-5xl mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -187,7 +214,7 @@ export default function HomePage() {
             </h3>
             <p className="text-sm text-earth-500 leading-relaxed mb-5">
               Compartilhe experiências, tire dúvidas e conecte-se com criadores
-              verificados e outros tutores apaixonados.
+              verificados e outros entusiastas de pet apaixonados.
             </p>
             <Link
               href="/comunidade"
@@ -228,7 +255,7 @@ export default function HomePage() {
               Siga no Instagram
             </h3>
             <p className="text-sm text-earth-500 leading-relaxed mb-5">
-              Bastidores dos canis, dicas de cuidados, depoimentos de tutores e
+              Bastidores dos canis, dicas de cuidados, depoimentos de entusiastas de pet e
               os filhotes mais fofos do Brasil.
             </p>
             <a
@@ -256,7 +283,7 @@ export default function HomePage() {
         <p className="text-earth-500 max-w-lg mx-auto leading-relaxed mb-8">
           A Fareja nasceu da necessidade real de separar criadores sérios de
           pessoas que apenas cruzam cães sem responsabilidade. Nosso compromisso
-          é com a qualidade de vida dos animais e a confiança dos tutores.
+          é com a qualidade de vida dos animais e a confiança dos entusiastas de pet.
         </p>
         <Link
           href="/para-criadores"
