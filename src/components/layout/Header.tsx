@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, Search, User, PawPrint } from "lucide-react";
+import { Menu, X, Search, User, PawPrint, LogOut, ChevronDown } from "lucide-react";
+import { useUser } from "@/lib/hooks/useUser";
 
 const navLinks = [
   { href: "/buscar", label: "Buscar canis" },
@@ -12,8 +13,88 @@ const navLinks = [
   { href: "/para-criadores", label: "Para criadores" },
 ];
 
+function UserMenu() {
+  const { user, signOut } = useUser();
+  const [open, setOpen] = useState(false);
+
+  if (!user) {
+    return (
+      <Link
+        href="/login"
+        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-600 bg-brand-100 hover:bg-brand-200 rounded-full transition-colors"
+      >
+        <User className="w-4 h-4" />
+        Entrar
+      </Link>
+    );
+  }
+
+  const name = user.user_metadata?.full_name ?? user.user_metadata?.name ?? user.email ?? "";
+  const initials = name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w: string) => w[0])
+    .join("")
+    .toUpperCase() || "U";
+  const avatarUrl = user.user_metadata?.avatar_url ?? user.user_metadata?.picture ?? null;
+  const displayName = name.split(" ")[0] || "Usuário";
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-earth-200 hover:bg-earth-50 transition-colors"
+      >
+        {avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={avatarUrl} alt={displayName} className="w-6 h-6 rounded-full object-cover" />
+        ) : (
+          <div className="w-6 h-6 rounded-full bg-brand-600 text-white flex items-center justify-center text-[10px] font-semibold">
+            {initials}
+          </div>
+        )}
+        <span className="text-sm font-medium text-earth-700 max-w-[80px] truncate">{displayName}</span>
+        <ChevronDown className="w-3.5 h-3.5 text-earth-400" />
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl border border-earth-200 shadow-lg z-50 py-1 overflow-hidden">
+            <div className="px-4 py-3 border-b border-earth-100">
+              <p className="text-xs font-semibold text-earth-800 truncate">{name}</p>
+              <p className="text-[11px] text-earth-400 truncate">{user.email}</p>
+            </div>
+            <Link
+              href="/painel"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 px-4 py-2.5 text-sm text-earth-700 hover:bg-earth-50 transition-colors"
+            >
+              <PawPrint className="w-4 h-4 text-earth-400" />
+              Meu painel
+            </Link>
+            <button
+              onClick={() => { setOpen(false); signOut(); }}
+              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Sair
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, signOut } = useUser();
+
+  const name = user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? user?.email ?? "";
+  const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture ?? null;
+  const initials = name.split(" ").filter(Boolean).slice(0, 2).map((w: string) => w[0]).join("").toUpperCase() || "U";
 
   return (
     <header className="sticky top-0 z-50 bg-[#FFFBF5]/90 backdrop-blur-md border-b border-earth-200">
@@ -49,13 +130,7 @@ export default function Header() {
           >
             <Search className="w-4 h-4" />
           </Link>
-          <Link
-            href="/login"
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-600 bg-brand-100 hover:bg-brand-200 rounded-full transition-colors"
-          >
-            <User className="w-4 h-4" />
-            Entrar
-          </Link>
+          <UserMenu />
         </div>
 
         {/* Mobile menu button */}
@@ -81,14 +156,40 @@ export default function Header() {
             </Link>
           ))}
           <div className="pt-3 border-t border-earth-200 mt-3">
-            <Link
-              href="/login"
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors"
-            >
-              <User className="w-4 h-4" />
-              Entrar ou cadastrar
-            </Link>
+            {user ? (
+              <div className="space-y-1">
+                <div className="flex items-center gap-3 px-4 py-2">
+                  {avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={avatarUrl} alt="" className="w-8 h-8 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center text-xs font-semibold">
+                      {initials}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-earth-800 truncate">{name.split(" ")[0]}</p>
+                    <p className="text-[11px] text-earth-400 truncate">{user.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { setMobileOpen(false); signOut(); }}
+                  className="flex items-center gap-2 w-full px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sair
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors"
+              >
+                <User className="w-4 h-4" />
+                Entrar ou cadastrar
+              </Link>
+            )}
           </div>
         </div>
       )}

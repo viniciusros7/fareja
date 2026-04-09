@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useUser } from "@/lib/hooks/useUser";
 import Link from "next/link";
 import {
   Heart, MessageCircle, Share2, Plus, HelpCircle,
@@ -28,6 +29,7 @@ const planBadge: Record<KennelPlan, { label: string; cls: string; icon: typeof S
 };
 
 export default function ComunidadePage() {
+  const { user } = useUser();
   const [tab, setTab] = useState<"feed" | "discussao">("feed");
   const [feedBreedFilter, setFeedBreedFilter] = useState("");
   const [discussionFilter, setDiscussionFilter] = useState<PostType | "all">("all");
@@ -134,7 +136,7 @@ export default function ComunidadePage() {
             {filteredFeed.map((post, idx) => {
               const badge = post.kennel_plan ? planBadge[post.kennel_plan] : null;
               const BadgeIcon = badge?.icon;
-              const isBlurred = idx >= 2;
+              const isBlurred = !user && idx >= 2;
 
               const articleEl = (
                 <article key={post.id} className="rounded-xl border border-earth-200 bg-white overflow-hidden card-hover">
@@ -206,7 +208,7 @@ export default function ComunidadePage() {
 
               if (!isBlurred) return articleEl;
 
-              if (idx === 2) {
+              if (!user && idx === 2) {
                 return (
                   <div key={post.id} className="relative">
                     <div className="blur-sm opacity-60 pointer-events-none select-none">

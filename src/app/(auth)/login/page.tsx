@@ -2,55 +2,121 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { PawPrint, Mail, Phone, ArrowRight, Heart, Search, Dog } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { PawPrint, Mail, ArrowRight, Heart, Search, Dog, CheckCircle2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
+type Mode = "choose" | "email" | "email_sent" | "pet_status";
 type PetStatus = "pet_parent" | "looking_first" | null;
 
 export default function LoginPage() {
-  const [mode, setMode] = useState<"choose" | "email" | "pet_status">("choose");
+  const [mode, setMode] = useState<Mode>("choose");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [petStatus, setPetStatus] = useState<PetStatus>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
 
-  const handleContinue = () => {
-    if (petStatus) {
-      // In real app: save pet_status to profile, redirect
-      setMode("choose");
+  const callbackUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`;
+
+  async function handleGoogle() {
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: callbackUrl },
+    });
+    if (error) {
+      setError("Erro ao conectar com Google. Tente novamente.");
+      setLoading(false);
     }
-  };
+  }
 
-  // After login, show pet status selection
-  const showPetStatus = () => {
-    setMode("pet_status");
-  };
+  async function handleMagicLink(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email) return;
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: callbackUrl },
+    });
+    if (error) {
+      setError("Erro ao enviar o link. Verifique o email e tente novamente.");
+      setLoading(false);
+      return;
+    }
+    setMode("email_sent");
+    setLoading(false);
+  }
+
+  async function handlePetStatus() {
+    if (!petStatus) return;
+    setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from("profiles").update({ pet_status: petStatus }).eq("id", user.id);
+    }
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center mx-auto mb-4">
-            <PawPrint className="w-7 h-7" />
-          </div>
+          <Link href="/" className="inline-block">
+            <div className="w-14 h-14 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center mx-auto mb-4">
+              <PawPrint className="w-7 h-7" />
+            </div>
+          </Link>
           <h1 className="font-display text-2xl font-semibold text-brand-900 mb-1">
             {mode === "pet_status" ? "Conte-nos sobre você" : "Entre na Fareja"}
           </h1>
           <p className="text-sm text-earth-500">
-            {mode === "pet_status"
+            {mode === "email_sent"
+              ? `Link enviado para ${email}`
+              : mode === "pet_status"
               ? "Isso nos ajuda a personalizar sua experiência."
               : "Encontre canis verificados e conecte-se com a comunidade."}
           </p>
         </div>
 
-        {/* ── Pet Status Selection ── */}
+        {/* Error */}
+        {error && (
+          <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700">
+            {error}
+          </div>
+        )}
+
+        {/* ── Email sent confirmation ── */}
+        {mode === "email_sent" && (
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-forest-50 text-forest-500 flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+            <p className="text-sm text-earth-600 leading-relaxed">
+              Enviamos um link de acesso para <strong>{email}</strong>.
+              Clique no link para entrar — não precisa de senha.
+            </p>
+            <button
+              onClick={() => { setMode("email"); setEmail(""); }}
+              className="text-xs text-brand-600 hover:text-brand-700 font-medium"
+            >
+              Usar outro email
+            </button>
+          </div>
+        )}
+
+        {/* ── Pet Status ── */}
         {mode === "pet_status" && (
           <div className="space-y-3">
             <button
               onClick={() => setPetStatus("pet_parent")}
               className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
-                petStatus === "pet_parent"
-                  ? "border-brand-500 bg-brand-50"
-                  : "border-earth-200 bg-white hover:border-earth-300"
+                petStatus === "pet_parent" ? "border-brand-500 bg-brand-50" : "border-earth-200 bg-white hover:border-earth-300"
               }`}
             >
               <div className="flex items-start gap-3">
@@ -62,8 +128,7 @@ export default function LoginPage() {
                 <div>
                   <div className="text-sm font-semibold text-earth-800">Pai/Mãe de pet</div>
                   <p className="text-xs text-earth-500 mt-0.5 leading-relaxed">
-                    Já tenho um ou mais cães e quero conectar com a comunidade,
-                    encontrar veterinários e casas de ração recomendadas.
+                    Já tenho um ou mais cães e quero conectar com a comunidade.
                   </p>
                 </div>
               </div>
@@ -72,9 +137,7 @@ export default function LoginPage() {
             <button
               onClick={() => setPetStatus("looking_first")}
               className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
-                petStatus === "looking_first"
-                  ? "border-brand-500 bg-brand-50"
-                  : "border-earth-200 bg-white hover:border-earth-300"
+                petStatus === "looking_first" ? "border-brand-500 bg-brand-50" : "border-earth-200 bg-white hover:border-earth-300"
               }`}
             >
               <div className="flex items-start gap-3">
@@ -86,8 +149,7 @@ export default function LoginPage() {
                 <div>
                   <div className="text-sm font-semibold text-earth-800">Procurando meu primeiro pet</div>
                   <p className="text-xs text-earth-500 mt-0.5 leading-relaxed">
-                    Ainda não tenho um cão e quero explorar raças, entender qual
-                    é ideal para mim e encontrar um canil de confiança.
+                    Ainda não tenho um cão e quero encontrar um canil de confiança.
                   </p>
                 </div>
               </div>
@@ -97,25 +159,20 @@ export default function LoginPage() {
               <div className="p-3 rounded-lg bg-forest-50 border border-forest-200">
                 <p className="text-xs text-forest-700 flex items-start gap-2">
                   <Dog className="w-4 h-4 shrink-0 mt-0.5" />
-                  <span>
-                    Perfeito! Vamos te ajudar com nosso <strong>guia de raças</strong> para
-                    encontrar o companheiro ideal para seu estilo de vida.
-                  </span>
+                  <span>Vamos te ajudar com nosso <strong>guia de raças</strong> para encontrar o companheiro ideal.</span>
                 </p>
               </div>
             )}
 
             <button
-              onClick={handleContinue}
-              disabled={!petStatus}
+              onClick={handlePetStatus}
+              disabled={!petStatus || loading}
               className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
-                petStatus
-                  ? "bg-brand-600 text-white hover:bg-brand-700"
-                  : "bg-earth-200 text-earth-400 cursor-not-allowed"
+                petStatus && !loading ? "bg-brand-600 text-white hover:bg-brand-700" : "bg-earth-200 text-earth-400 cursor-not-allowed"
               }`}
             >
-              Continuar
-              <ArrowRight className="w-4 h-4" />
+              {loading ? "Salvando..." : "Continuar"}
+              {!loading && <ArrowRight className="w-4 h-4" />}
             </button>
           </div>
         )}
@@ -123,10 +180,10 @@ export default function LoginPage() {
         {/* ── Auth Methods ── */}
         {mode === "choose" && (
           <div className="space-y-3">
-            {/* Google */}
             <button
-              onClick={showPetStatus}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-earth-200 rounded-xl text-sm font-medium text-earth-800 hover:bg-earth-50 hover:border-earth-300 transition-colors"
+              onClick={handleGoogle}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-earth-200 rounded-xl text-sm font-medium text-earth-800 hover:bg-earth-50 hover:border-earth-300 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -134,7 +191,7 @@ export default function LoginPage() {
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
-              Continuar com Google
+              {loading ? "Redirecionando..." : "Continuar com Google"}
             </button>
 
             <div className="flex items-center gap-3 my-4">
@@ -155,10 +212,7 @@ export default function LoginPage() {
 
         {/* ── Email Form ── */}
         {mode === "email" && (
-          <form
-            onSubmit={(e) => { e.preventDefault(); showPetStatus(); }}
-            className="space-y-4"
-          >
+          <form onSubmit={handleMagicLink} className="space-y-4">
             <div>
               <label className="block text-xs font-medium text-earth-600 mb-1.5">Email</label>
               <input
@@ -168,25 +222,19 @@ export default function LoginPage() {
                 placeholder="seu@email.com"
                 className="w-full px-4 py-2.5 text-sm border border-earth-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-brand-400/30 focus:border-brand-400 placeholder:text-earth-300"
                 required
+                autoFocus
               />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-earth-600 mb-1.5">Telefone (com DDD)</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="(11) 99999-0000"
-                className="w-full px-4 py-2.5 text-sm border border-earth-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-brand-400/30 focus:border-brand-400 placeholder:text-earth-300"
-                required
-              />
-            </div>
+            <p className="text-xs text-earth-400 leading-relaxed">
+              Vamos enviar um link de acesso para o seu email. Sem senha necessária.
+            </p>
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Criar conta
-              <ArrowRight className="w-4 h-4" />
+              {loading ? "Enviando..." : "Enviar link de acesso"}
+              {!loading && <ArrowRight className="w-4 h-4" />}
             </button>
             <button
               type="button"
@@ -198,12 +246,14 @@ export default function LoginPage() {
           </form>
         )}
 
-        <p className="text-center text-xs text-earth-400 mt-6 leading-relaxed">
-          Ao continuar, você concorda com os{" "}
-          <Link href="#" className="text-brand-600 hover:underline">Termos de Uso</Link>{" "}
-          e a{" "}
-          <Link href="#" className="text-brand-600 hover:underline">Política de Privacidade</Link>.
-        </p>
+        {mode !== "email_sent" && mode !== "pet_status" && (
+          <p className="text-center text-xs text-earth-400 mt-6 leading-relaxed">
+            Ao continuar, você concorda com os{" "}
+            <Link href="#" className="text-brand-600 hover:underline">Termos de Uso</Link>{" "}
+            e a{" "}
+            <Link href="#" className="text-brand-600 hover:underline">Política de Privacidade</Link>.
+          </p>
+        )}
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { mockDonations } from "@/lib/mock-data";
 import type { Donation } from "@/types";
+import { useUser } from "@/lib/hooks/useUser";
 
 const allBreeds = [
   "Golden Retriever", "Beagle", "Labrador Retriever", "Shih Tzu",
@@ -18,9 +19,6 @@ const allBreeds = [
 ];
 
 const allStates = ["SP", "PR", "MG", "RJ", "RS", "SC", "BA", "PE", "CE", "GO"];
-
-// Simulação simples de sessão — sem auth real
-const IS_LOGGED_IN = false;
 
 function LoginGate() {
   return (
@@ -305,12 +303,14 @@ function CadastroModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function DoacoesPage() {
+  const { user, loading } = useUser();
   const [showModal, setShowModal] = useState(false);
   const [breedFilter, setBreedFilter] = useState("");
   const [stateFilter, setStateFilter] = useState("");
   const [donorFilter, setDonorFilter] = useState<"all" | "kennel" | "individual">("all");
 
-  if (!IS_LOGGED_IN) return <LoginGate />;
+  if (loading) return null;
+  if (!user) return <LoginGate />;
 
   const filtered = mockDonations.filter((d) => {
     if (breedFilter && d.breed !== breedFilter) return false;
