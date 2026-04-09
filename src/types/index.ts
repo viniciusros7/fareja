@@ -3,7 +3,7 @@
 // ============================================================
 
 // ---- Enums ----
-export type UserRole = "client" | "kennel" | "admin";
+export type UserRole = "client" | "kennel" | "approver" | "super_admin";
 export type KennelPlan = "basic" | "premium" | "super_premium";
 export type KennelStatus = "pending" | "approved" | "rejected" | "suspended";
 export type PuppyStatus = "available" | "reserved" | "sold" | "upcoming";
