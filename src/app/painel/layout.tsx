@@ -4,8 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   PawPrint, User, Dog, FileText, Star, MessageCircle,
-  Stethoscope, Store, BarChart3, Settings, Gem,
+  Stethoscope, Store, BarChart3, Settings, Gem, Loader2,
 } from "lucide-react";
+import { useRole } from "@/lib/hooks/useRole";
+import { useUser } from "@/lib/hooks/useUser";
+import AccessDenied from "@/components/layout/AccessDenied";
 
 const navItems = [
   { href: "/painel", label: "Visão geral", icon: BarChart3 },
@@ -20,6 +23,20 @@ const navItems = [
 
 export default function PainelLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { user, loading: userLoading } = useUser();
+  const { loading: roleLoading, isKennel } = useRole();
+
+  if (userLoading || roleLoading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-earth-400" />
+      </div>
+    );
+  }
+
+  if (!user || !isKennel) {
+    return <AccessDenied message="O painel de canil é exclusivo para criadores verificados." />;
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">

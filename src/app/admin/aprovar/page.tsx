@@ -1,11 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   ShieldCheck, CheckCircle2, XCircle, Clock, Eye,
   ChevronDown, ChevronUp, MapPin, Phone, Mail,
   Gem, Sparkles, Star, AlertTriangle, Search,
+  DollarSign, Users, Settings, MessageCircle, Loader2,
 } from "lucide-react";
+import { useRole } from "@/lib/hooks/useRole";
+import { useUser } from "@/lib/hooks/useUser";
+import AccessDenied from "@/components/layout/AccessDenied";
 
 // Simulated pending kennels (in production these come from Supabase)
 const pendingKennels = [
@@ -60,19 +65,62 @@ const planLabel: Record<string, { label: string; cls: string }> = {
   super_premium: { label: "Elite", cls: "bg-gradient-to-r from-brand-600 to-brand-500 text-white" },
 };
 
-const statusLabel: Record<string, { label: string; cls: string }> = {
-  pending: { label: "Pendente", cls: "bg-yellow-50 text-yellow-700" },
-  approved: { label: "Aprovado", cls: "bg-forest-50 text-forest-600" },
-  rejected: { label: "Rejeitado", cls: "bg-red-50 text-red-700" },
-};
+function AdminNav({ active }: { active: "aprovar" | "financeiro" | "usuarios" | "configuracoes" | "mensagens" }) {
+  const { role } = useRole();
+
+  const superAdminTabs = [
+    { key: "aprovar", label: "Aprovar canis", href: "/admin/aprovar", icon: ShieldCheck },
+    { key: "financeiro", label: "Financeiro", href: "/admin/financeiro", icon: DollarSign },
+    { key: "usuarios", label: "Usuários", href: "/admin/usuarios", icon: Users },
+    { key: "configuracoes", label: "Configurações", href: "/admin/configuracoes", icon: Settings },
+  ];
+
+  const approverTabs = [
+    { key: "aprovar", label: "Aprovar canis", href: "/admin/aprovar", icon: ShieldCheck },
+    { key: "mensagens", label: "Mensagens", href: "/admin/mensagens", icon: MessageCircle },
+  ];
+
+  const tabs = role === "super_admin" ? superAdminTabs : approverTabs;
+
+  return (
+    <div className="flex gap-1 p-1 bg-earth-100 rounded-lg mb-6 overflow-x-auto">
+      {tabs.map(({ key, label, href, icon: Icon }) => (
+        <Link
+          key={key}
+          href={href}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
+            active === key ? "bg-white text-earth-900 shadow-sm" : "text-earth-500 hover:text-earth-700"
+          }`}
+        >
+          <Icon className="w-4 h-4" />
+          {label}
+        </Link>
+      ))}
+    </div>
+  );
+}
 
 export default function AdminAprovarPage() {
+  const { user, loading: userLoading } = useUser();
+  const { role, loading: roleLoading, isApprover } = useRole();
   const [tab, setTab] = useState<"pending" | "approved">("pending");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [showRejectModal, setShowRejectModal] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [actionLog, setActionLog] = useState<string[]>([]);
+
+  if (userLoading || roleLoading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-earth-400" />
+      </div>
+    );
+  }
+
+  if (!user || !isApprover) {
+    return <AccessDenied message="Esta área é restrita a aprovadores e administradores." />;
+  }
 
   const handleApprove = (kennelName: string) => {
     setActionLog((prev) => [`✅ ${kennelName} aprovado em ${new Date().toLocaleString("pt-BR")}`, ...prev]);
@@ -99,6 +147,9 @@ export default function AdminAprovarPage() {
         </div>
       </div>
 
+      {/* Admin nav tabs */}
+      <AdminNav active="aprovar" />
+
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mb-6">
         <div className="p-4 rounded-xl bg-yellow-50 border border-yellow-200">
@@ -117,7 +168,7 @@ export default function AdminAprovarPage() {
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Sub-tabs */}
       <div className="flex gap-1 p-1 bg-earth-100 rounded-lg mb-5">
         <button
           onClick={() => setTab("pending")}

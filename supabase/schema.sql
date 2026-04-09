@@ -17,7 +17,7 @@ create table public.profiles (
   phone text,
   full_name text not null default '',
   avatar_url text,
-  role text not null default 'client' check (role in ('client', 'kennel', 'admin')),
+  role text not null default 'client' check (role in ('client', 'kennel', 'approver', 'super_admin')),
   pet_status text not null default 'not_specified' check (pet_status in ('pet_parent', 'looking_first', 'not_specified')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

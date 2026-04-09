@@ -26,3 +26,28 @@
 | Texto (marrom escuro) | `#2C1810` | Texto principal |
 
 Use essas cores via classes Tailwind customizadas (configuradas em `tailwind.config`) ou diretamente como valores arbitrários (`bg-[#C2703E]`, etc.) enquanto o config não estiver atualizado.
+
+## Roles de usuário
+
+A tabela `profiles` tem 4 roles: `client`, `kennel`, `approver`, `super_admin`.
+
+Para setar roles manualmente no **Supabase SQL Editor** (Dashboard → SQL Editor):
+
+```sql
+-- Promover a super_admin:
+UPDATE public.profiles SET role = 'super_admin' WHERE email = 'seu@email.com';
+
+-- Promover a approver:
+UPDATE public.profiles SET role = 'approver' WHERE email = 'aprovador@email.com';
+
+-- Promover a kennel (dono de canil):
+UPDATE public.profiles SET role = 'kennel' WHERE email = 'criador@email.com';
+
+-- Listar todos os usuários e roles:
+SELECT id, email, full_name, role, created_at FROM public.profiles ORDER BY created_at DESC;
+```
+
+Rotas protegidas:
+- `/admin/aprovar` → `approver` ou `super_admin`
+- `/admin/financeiro` → `super_admin` apenas
+- `/painel/*` → `kennel` apenas
