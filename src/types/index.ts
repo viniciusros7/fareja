@@ -193,6 +193,25 @@ export interface Comment {
   created_at: string;
 }
 
+// ---- Doações ----
+export interface Donation {
+  id: string;
+  dog_name: string;
+  breed: string;
+  age: string;
+  sex: "male" | "female";
+  city: string;
+  state: string;
+  reason: string;
+  description: string;
+  contact: string;
+  donor_type: "kennel" | "individual";
+  kennel_name: string | null;
+  kennel_verified: boolean;
+  image_id: number;
+  created_at: string;
+}
+
 // ---- Filtros de busca ----
 export interface SearchFilters {
   query: string;
