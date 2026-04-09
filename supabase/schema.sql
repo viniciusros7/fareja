@@ -323,3 +323,45 @@ create trigger on_comment_created
 create trigger on_like_changed
   after insert or delete on public.post_likes
   for each row execute function public.update_post_counts();
+
+-- ============================================================
+-- TABELA DE RAÇAS
+-- ============================================================
+
+create table public.breeds (
+  id uuid default gen_random_uuid() primary key,
+  name_pt text not null,
+  name_en text not null unique,
+  breed_group text,
+  size text check (size in ('small', 'medium', 'large', 'giant')),
+  coat text check (coat in ('short', 'medium', 'long', 'hairless')),
+  energy_level int check (energy_level between 1 and 5),
+  grooming_needs int check (grooming_needs between 1 and 5),
+  trainability int check (trainability between 1 and 5),
+  friendliness int check (friendliness between 1 and 5),
+  good_with_kids boolean default true,
+  good_for_apartments boolean default false,
+  exercise_needs int check (exercise_needs between 1 and 5),
+  shedding_level int check (shedding_level between 1 and 5),
+  weight_min_kg numeric,
+  weight_max_kg numeric,
+  height_min_cm numeric,
+  height_max_cm numeric,
+  life_span_min int,
+  life_span_max int,
+  temperament_pt text,
+  description_pt text,
+  image_url text,
+  created_at timestamptz default now()
+);
+
+alter table public.breeds enable row level security;
+create policy "Raças visíveis para todos" on public.breeds for select using (true);
+
+create index idx_breeds_size on public.breeds(size);
+create index idx_breeds_coat on public.breeds(coat);
+create index idx_breeds_group on public.breeds(breed_group);
+
+-- Para executar o seed após criar a tabela, adicione a chave service_role ao .env.local:
+-- SUPABASE_SERVICE_ROLE_KEY=sua_chave_aqui
+-- Depois rode: npx tsx src/lib/seed-breeds.ts
