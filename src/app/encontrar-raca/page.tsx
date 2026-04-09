@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, Home, Users, Clock, Ruler, RotateCcw, PawPrint } from "lucide-react";
+import { ArrowLeft, ArrowRight, Home, Users, Clock, Ruler, RotateCcw, PawPrint, Scissors } from "lucide-react";
 import { breedGuide } from "@/lib/mock-data";
 import type { BreedGuide } from "@/types";
 
@@ -11,12 +11,14 @@ type HousingAnswer = "casa" | "apartamento";
 type KidsAnswer = "sim" | "nao";
 type WalksAnswer = "pouco" | "medio" | "muito";
 type SizeAnswer = "pequeno" | "medio" | "grande";
+type CoatAnswer = "long" | "medium" | "short";
 
 interface Answers {
   housing: HousingAnswer | null;
   kids: KidsAnswer | null;
   walks: WalksAnswer | null;
   size: SizeAnswer | null;
+  coat: CoatAnswer | null;
 }
 
 // placedog IDs para cada raça (mapeamento fixo)
@@ -38,6 +40,8 @@ const breedImageId: Record<string, number> = {
   "Spitz Alemão": 84,
 };
 
+const MAX_SCORE = 14; // 3 (housing) + 2 (kids) + 3 (walks) + 3 (size) + 3 (coat)
+
 function scoreBreed(breed: BreedGuide, answers: Answers): number {
   let score = 0;
 
@@ -47,7 +51,7 @@ function scoreBreed(breed: BreedGuide, answers: Answers): number {
     else if (breed.apartment_friendly === "with_limitations") score += 1;
     else score -= 2;
   } else {
-    score += 1; // casa aceita qualquer raça
+    score += 1;
   }
 
   // Crianças
@@ -82,8 +86,31 @@ function scoreBreed(breed: BreedGuide, answers: Answers): number {
     else score -= 1;
   }
 
+  // Pelagem
+  if (answers.coat === "long") {
+    if (breed.coat === "long") score += 3;
+    else if (breed.coat === "medium") score += 1;
+  } else if (answers.coat === "medium") {
+    if (breed.coat === "medium") score += 3;
+    else score += 1;
+  } else {
+    if (breed.coat === "short") score += 3;
+    else if (breed.coat === "medium") score += 1;
+    else score -= 1;
+  }
+
   return score;
 }
+
+function matchPercent(score: number): number {
+  return Math.max(0, Math.round((score / MAX_SCORE) * 100));
+}
+
+const coatLabels: Record<string, string> = {
+  short: "Pelo curto",
+  medium: "Pelo médio",
+  long: "Pelo longo",
+};
 
 const sizeLabels: Record<string, string> = {
   small: "Pequeno",
@@ -103,41 +130,47 @@ const steps = [
   { id: 2, question: "Tem crianças em casa?", icon: Users },
   { id: 3, question: "Quanto tempo tem para passeios por dia?", icon: Clock },
   { id: 4, question: "Qual porte prefere?", icon: Ruler },
+  { id: 5, question: "Cuidados com a pelagem?", icon: Scissors },
 ];
 
+const TOTAL_STEPS = 5;
+const RESULT_STEP = TOTAL_STEPS + 1;
+
 export default function EncontrarRacaPage() {
-  const [step, setStep] = useState(0); // 0=intro, 1-4=perguntas, 5=resultado
+  const [step, setStep] = useState(0); // 0=intro, 1–5=perguntas, 6=resultado
   const [answers, setAnswers] = useState<Answers>({
     housing: null,
     kids: null,
     walks: null,
     size: null,
+    coat: null,
   });
-
-  const totalSteps = 4;
 
   function handleAnswer(key: keyof Answers, value: string) {
     const next = { ...answers, [key]: value };
     setAnswers(next);
-    if (step < totalSteps) {
+    if (step < TOTAL_STEPS) {
       setStep(step + 1);
     } else {
-      setStep(5);
+      setStep(RESULT_STEP);
     }
   }
 
+  function goBack() {
+    if (step > 1) setStep(step - 1);
+  }
+
   function reset() {
-    setAnswers({ housing: null, kids: null, walks: null, size: null });
+    setAnswers({ housing: null, kids: null, walks: null, size: null, coat: null });
     setStep(0);
   }
 
-  const topBreeds =
-    step === 5
+  const scoredBreeds =
+    step === RESULT_STEP
       ? [...breedGuide]
           .map((b) => ({ breed: b, score: scoreBreed(b, answers) }))
           .sort((a, b) => b.score - a.score)
           .slice(0, 3)
-          .map((x) => x.breed)
       : [];
 
   return (
@@ -160,7 +193,7 @@ export default function EncontrarRacaPage() {
             Qual raça é para mim?
           </h1>
           <p className="text-earth-500 max-w-sm mx-auto mb-8 leading-relaxed">
-            Responda 4 perguntas rápidas e descubra as 3 raças mais compatíveis com o seu estilo de vida.
+            Responda {TOTAL_STEPS} perguntas rápidas e descubra as 3 raças mais compatíveis com o seu estilo de vida.
           </p>
           <button
             onClick={() => setStep(1)}
@@ -172,12 +205,12 @@ export default function EncontrarRacaPage() {
         </div>
       )}
 
-      {/* Perguntas 1–4 */}
-      {step >= 1 && step <= 4 && (
+      {/* Perguntas 1–5 */}
+      {step >= 1 && step <= TOTAL_STEPS && (
         <div>
           {/* Progress */}
-          <div className="flex items-center gap-2 mb-8">
-            {Array.from({ length: totalSteps }).map((_, i) => (
+          <div className="flex items-center gap-2 mb-6">
+            {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
               <div
                 key={i}
                 className={`h-1.5 flex-1 rounded-full transition-colors ${
@@ -187,9 +220,23 @@ export default function EncontrarRacaPage() {
             ))}
           </div>
 
-          <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">
-            Pergunta {step} de {totalSteps}
-          </p>
+          {/* Back + step label */}
+          <div className="flex items-center justify-between mb-4">
+            {step > 1 ? (
+              <button
+                onClick={goBack}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-earth-600 bg-white border border-earth-200 rounded-full hover:bg-earth-50 transition-colors"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Voltar
+              </button>
+            ) : (
+              <div />
+            )}
+            <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest">
+              Pergunta {step} de {TOTAL_STEPS}
+            </p>
+          </div>
 
           {/* Q1 */}
           {step === 1 && (
@@ -205,7 +252,11 @@ export default function EncontrarRacaPage() {
                   <button
                     key={opt.value}
                     onClick={() => handleAnswer("housing", opt.value)}
-                    className="p-5 rounded-2xl border-2 border-earth-200 bg-white hover:border-brand-400 hover:bg-brand-50 text-left transition-all group"
+                    className={`p-5 rounded-2xl border-2 bg-white text-left transition-all group ${
+                      answers.housing === opt.value
+                        ? "border-brand-500 bg-brand-50"
+                        : "border-earth-200 hover:border-brand-400 hover:bg-brand-50"
+                    }`}
                   >
                     <div className="text-3xl mb-3">{opt.emoji}</div>
                     <div className="text-base font-semibold text-earth-900 group-hover:text-brand-700">{opt.label}</div>
@@ -230,7 +281,11 @@ export default function EncontrarRacaPage() {
                   <button
                     key={opt.value}
                     onClick={() => handleAnswer("kids", opt.value)}
-                    className="p-5 rounded-2xl border-2 border-earth-200 bg-white hover:border-brand-400 hover:bg-brand-50 text-left transition-all group"
+                    className={`p-5 rounded-2xl border-2 bg-white text-left transition-all group ${
+                      answers.kids === opt.value
+                        ? "border-brand-500 bg-brand-50"
+                        : "border-earth-200 hover:border-brand-400 hover:bg-brand-50"
+                    }`}
                   >
                     <div className="text-3xl mb-3">{opt.emoji}</div>
                     <div className="text-base font-semibold text-earth-900 group-hover:text-brand-700">{opt.label}</div>
@@ -256,7 +311,11 @@ export default function EncontrarRacaPage() {
                   <button
                     key={opt.value}
                     onClick={() => handleAnswer("walks", opt.value)}
-                    className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 border-earth-200 bg-white hover:border-brand-400 hover:bg-brand-50 text-left transition-all group"
+                    className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 bg-white text-left transition-all group ${
+                      answers.walks === opt.value
+                        ? "border-brand-500 bg-brand-50"
+                        : "border-earth-200 hover:border-brand-400 hover:bg-brand-50"
+                    }`}
                   >
                     <div className="text-2xl">{opt.emoji}</div>
                     <div>
@@ -284,7 +343,11 @@ export default function EncontrarRacaPage() {
                   <button
                     key={opt.value}
                     onClick={() => handleAnswer("size", opt.value)}
-                    className="p-4 rounded-2xl border-2 border-earth-200 bg-white hover:border-brand-400 hover:bg-brand-50 text-left transition-all group"
+                    className={`p-4 rounded-2xl border-2 bg-white text-left transition-all group ${
+                      answers.size === opt.value
+                        ? "border-brand-500 bg-brand-50"
+                        : "border-earth-200 hover:border-brand-400 hover:bg-brand-50"
+                    }`}
                   >
                     <div className="text-3xl mb-2">{opt.emoji}</div>
                     <div className="text-sm font-semibold text-earth-900 group-hover:text-brand-700">{opt.label}</div>
@@ -295,21 +358,43 @@ export default function EncontrarRacaPage() {
             </>
           )}
 
-          {/* Back */}
-          {step > 1 && (
-            <button
-              onClick={() => setStep(step - 1)}
-              className="mt-6 flex items-center gap-1.5 text-sm text-earth-400 hover:text-earth-600 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Voltar
-            </button>
+          {/* Q5 — Pelagem */}
+          {step === 5 && (
+            <>
+              <h2 className="font-display text-2xl font-semibold text-brand-900 mb-2">
+                No seu dia a dia, sobra um tempinho para cuidar do visual do pet?
+              </h2>
+              <p className="text-sm text-earth-400 mb-6">Escolha o que combina mais com sua rotina.</p>
+              <div className="space-y-3">
+                {[
+                  { value: "long", label: "Sim, adoro cuidar!", emoji: "✂️", desc: "Pelos longos, escovação diária e tosa profissional frequente" },
+                  { value: "medium", label: "Um pouco, sem exagero", emoji: "🪮", desc: "Pelagem média, manutenção moderada" },
+                  { value: "short", label: "Prefiro praticidade", emoji: "🐾", desc: "Pelo curto, baixa manutenção" },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => handleAnswer("coat", opt.value)}
+                    className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 bg-white text-left transition-all group ${
+                      answers.coat === opt.value
+                        ? "border-brand-500 bg-brand-50"
+                        : "border-earth-200 hover:border-brand-400 hover:bg-brand-50"
+                    }`}
+                  >
+                    <div className="text-2xl">{opt.emoji}</div>
+                    <div>
+                      <div className="text-sm font-semibold text-earth-900 group-hover:text-brand-700">{opt.label}</div>
+                      <div className="text-xs text-earth-400">{opt.desc}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
           )}
         </div>
       )}
 
       {/* Resultado */}
-      {step === 5 && (
+      {step === RESULT_STEP && (
         <div>
           <h2 className="font-display text-2xl font-semibold text-brand-900 mb-1">
             Suas raças ideais
@@ -319,8 +404,9 @@ export default function EncontrarRacaPage() {
           </p>
 
           <div className="space-y-4">
-            {topBreeds.map((breed, i) => {
+            {scoredBreeds.map(({ breed, score }, i) => {
               const imgId = breedImageId[breed.name] ?? (70 + i);
+              const pct = matchPercent(score);
               return (
                 <div key={breed.name} className="rounded-2xl border border-earth-200 bg-white overflow-hidden">
                   {/* Image */}
@@ -335,6 +421,11 @@ export default function EncontrarRacaPage() {
                     <div className="absolute top-3 left-3">
                       <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-brand-600 text-white">
                         #{i + 1}
+                      </span>
+                    </div>
+                    <div className="absolute top-3 right-3">
+                      <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-white/90 text-brand-700">
+                        {pct}% match
                       </span>
                     </div>
                   </div>
@@ -355,6 +446,9 @@ export default function EncontrarRacaPage() {
                       </span>
                       <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-50 text-blue-700">
                         Energia {energyLabels[breed.energy_level]}
+                      </span>
+                      <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-purple-50 text-purple-700">
+                        {coatLabels[breed.coat]}
                       </span>
                       {breed.good_with_kids && (
                         <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-forest-50 text-forest-600">
