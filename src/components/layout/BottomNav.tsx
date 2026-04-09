@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Search, Users, User } from "lucide-react";
+import { Home, Search, Heart, Users, User } from "lucide-react";
 
 const items = [
   { href: "/", icon: Home, label: "Início" },
   { href: "/buscar", icon: Search, label: "Buscar" },
+  { href: "/doacoes", icon: Heart, label: "Doações" },
   { href: "/comunidade", icon: Users, label: "Comunidade" },
   { href: "/login", icon: User, label: "Perfil" },
 ];
@@ -23,7 +24,7 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 px-5 py-2 transition-colors ${
+              className={`flex flex-col items-center gap-0.5 px-3 py-2 transition-colors ${
                 active ? "text-brand-600" : "text-earth-400 hover:text-earth-600"
               }`}
             >

@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Heart, MessageCircle, Share2, Plus, HelpCircle,
   Lightbulb, BookOpen, Sparkles, CheckCircle2,
   PawPrint, Filter, Camera, Image as ImageIcon,
-  Gem, Star, AtSign,
+  Gem, Star, AtSign, Lock,
 } from "lucide-react";
 import { mockPosts, mockFeedPosts, allBreeds } from "@/lib/mock-data";
 import type { PostType, KennelPlan } from "@/types";
@@ -130,11 +131,12 @@ export default function ComunidadePage() {
 
           {/* Feed posts */}
           <div className="space-y-5">
-            {filteredFeed.map((post) => {
+            {filteredFeed.map((post, idx) => {
               const badge = post.kennel_plan ? planBadge[post.kennel_plan] : null;
               const BadgeIcon = badge?.icon;
+              const isBlurred = idx >= 2;
 
-              return (
+              const articleEl = (
                 <article key={post.id} className="rounded-xl border border-earth-200 bg-white overflow-hidden card-hover">
                   {/* Author header */}
                   <div className="px-4 py-3 flex items-center gap-3">
@@ -201,6 +203,40 @@ export default function ComunidadePage() {
                   </div>
                 </article>
               );
+
+              if (!isBlurred) return articleEl;
+
+              if (idx === 2) {
+                return (
+                  <div key={post.id} className="relative">
+                    <div className="blur-sm opacity-60 pointer-events-none select-none">
+                      {articleEl}
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="bg-white/95 backdrop-blur-sm border border-earth-200 rounded-2xl p-6 text-center shadow-lg mx-4 max-w-xs w-full">
+                        <div className="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center mx-auto mb-3">
+                          <Lock className="w-4 h-4 text-brand-600" />
+                        </div>
+                        <h3 className="text-sm font-semibold text-earth-900 mb-1">
+                          Ver mais no feed
+                        </h3>
+                        <p className="text-xs text-earth-500 mb-4 leading-relaxed">
+                          Crie sua conta gratuita para ver todos os posts da comunidade.
+                        </p>
+                        <Link
+                          href="/login"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-xs font-semibold rounded-full hover:bg-brand-700 transition-colors"
+                        >
+                          <PawPrint className="w-3 h-3" />
+                          Criar conta grátis
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              return null;
             })}
 
             {filteredFeed.length === 0 && (
