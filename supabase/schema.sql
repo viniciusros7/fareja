@@ -442,3 +442,73 @@ create policy "Autor edita doação" on public.donations
 
 create index if not exists idx_donations_status on public.donations(status);
 create index if not exists idx_donations_state on public.donations(state);
+
+-- ============================================================
+-- FASE 9B — Feed de posts com imagens, curtidas e comentários
+-- ============================================================
+-- Execute no SQL Editor do Supabase
+
+-- Colunas adicionais na tabela posts existente
+alter table public.posts
+  add column if not exists images text[] default '{}',
+  add column if not exists thumbnails text[] default '{}',
+  add column if not exists status text default 'published';
+
+do $$ begin
+  alter table public.posts add constraint posts_status_check
+    check (status in ('published', 'pending', 'removed'));
+exception when duplicate_object then null;
+end $$;
+
+-- Atualiza RLS: posts visíveis se publicados OU próprios
+drop policy if exists "Posts visíveis" on public.posts;
+create policy "Posts publicados visíveis" on public.posts
+  for select using (status = 'published' or author_id = auth.uid());
+
+-- Garantir que autenticados podem inserir
+drop policy if exists "Autenticados postam" on public.posts;
+create policy "Autenticados postam" on public.posts
+  for insert with check (auth.uid() = author_id);
+
+-- Garantir id em post_likes
+alter table public.post_likes add column if not exists id uuid default gen_random_uuid();
+create unique index if not exists idx_post_likes_unique on public.post_likes(post_id, user_id);
+
+-- Tabela de comentários do feed (separada da 'comments' de posts de fórum)
+create table if not exists public.post_comments (
+  id uuid default gen_random_uuid() primary key,
+  post_id uuid references public.posts(id) on delete cascade not null,
+  author_id uuid references public.profiles(id) not null,
+  content text not null,
+  created_at timestamptz default now()
+);
+
+alter table public.post_comments enable row level security;
+
+create policy "Comentários do feed visíveis" on public.post_comments
+  for select using (true);
+create policy "Autor gerencia comentário do feed" on public.post_comments
+  for all using (author_id = auth.uid());
+
+create index if not exists idx_post_comments_post    on public.post_comments(post_id);
+create index if not exists idx_post_comments_created on public.post_comments(created_at desc);
+create index if not exists idx_posts_created_desc    on public.posts(created_at desc);
+create index if not exists idx_posts_status          on public.posts(status);
+
+-- Trigger: mantém comments_count sincronizado com post_comments
+create or replace function public.sync_post_comment_count()
+returns trigger as $$
+begin
+  if tg_op = 'INSERT' then
+    update public.posts set comments_count = comments_count + 1 where id = new.post_id;
+  elsif tg_op = 'DELETE' then
+    update public.posts set comments_count = greatest(0, comments_count - 1) where id = old.post_id;
+  end if;
+  return coalesce(new, old);
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_post_comment_feed_changed on public.post_comments;
+create trigger on_post_comment_feed_changed
+  after insert or delete on public.post_comments
+  for each row execute function public.sync_post_comment_count();
