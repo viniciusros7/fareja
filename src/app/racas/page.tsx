@@ -9,6 +9,8 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import type { BreedRow } from "@/lib/queries/breeds";
 import BreedImage from "@/components/BreedImage";
+import FavoriteButton from "@/components/FavoriteButton";
+import { useFavorites } from "@/lib/hooks/useFavorites";
 
 const sizeLabels: Record<string, string> = {
   small: "Pequeno", medium: "Médio", large: "Grande", giant: "Gigante",
@@ -68,6 +70,7 @@ export default function RacasPage() {
   const [coatFilter, setCoatFilter] = useState("all");
   const [groupFilter, setGroupFilter] = useState("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const { isFavorited, toggle } = useFavorites();
 
   useEffect(() => {
     createClient()
@@ -205,6 +208,12 @@ export default function RacasPage() {
                       </span>
                     </div>
                   )}
+                  <div className="absolute top-3 right-3">
+                    <FavoriteButton
+                      favorited={isFavorited("breed", breed.id)}
+                      onToggle={() => toggle("breed", breed.id)}
+                    />
+                  </div>
                 </div>
 
                 {/* Base info */}

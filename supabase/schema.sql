@@ -383,3 +383,62 @@ alter table public.kennels
 -- Índices adicionais
 create index if not exists idx_kennels_offers_hotel on public.kennels(offers_hotel);
 create index if not exists idx_kennels_offers_transport on public.kennels(offers_transport);
+
+-- ============================================================
+-- FASE 8 — Favoritos estendidos + tabela de doações
+-- ============================================================
+-- Execute no SQL Editor do Supabase (Dashboard → SQL Editor)
+
+-- Atualiza tabela favorites para suportar raças e canis
+alter table public.favorites drop constraint if exists favorites_pkey;
+alter table public.favorites add column if not exists id uuid default gen_random_uuid();
+alter table public.favorites add column if not exists breed_id uuid references public.breeds(id) on delete cascade;
+alter table public.favorites alter column kennel_id drop not null;
+
+-- Nova PK em id (executar apenas se a coluna id foi adicionada acima)
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'favorites_pkey' and conrelid = 'public.favorites'::regclass
+  ) then
+    alter table public.favorites add primary key (id);
+  end if;
+end $$;
+
+create unique index if not exists idx_favorites_user_kennel
+  on public.favorites(user_id, kennel_id) where kennel_id is not null;
+create unique index if not exists idx_favorites_user_breed
+  on public.favorites(user_id, breed_id) where breed_id is not null;
+
+-- Tabela de doações
+create table if not exists public.donations (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  kennel_id uuid references public.kennels(id) on delete set null,
+  dog_name text not null,
+  breed text not null default '',
+  age text not null default '',
+  sex text not null check (sex in ('male', 'female')),
+  city text not null,
+  state text not null,
+  reason text not null default '',
+  description text not null default '',
+  contact text not null,
+  contact_method text not null default 'whatsapp' check (contact_method in ('whatsapp', 'email', 'phone')),
+  donor_type text not null check (donor_type in ('kennel', 'individual')),
+  status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
+  image_url text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.donations enable row level security;
+
+create policy "Doações aprovadas visíveis" on public.donations
+  for select using (status = 'approved' or user_id = auth.uid());
+create policy "Autenticados cadastram doações" on public.donations
+  for insert with check (auth.uid() = user_id);
+create policy "Autor edita doação" on public.donations
+  for update using (auth.uid() = user_id);
+
+create index if not exists idx_donations_status on public.donations(status);
+create index if not exists idx_donations_state on public.donations(state);

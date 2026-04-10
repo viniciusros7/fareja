@@ -4,13 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   PawPrint, User, Dog, FileText, Star, MessageCircle,
-  Stethoscope, Store, BarChart3, Settings, Gem, Loader2,
+  Stethoscope, BarChart3, Settings, Gem, Loader2, Heart,
 } from "lucide-react";
 import { useRole } from "@/lib/hooks/useRole";
 import { useUser } from "@/lib/hooks/useUser";
 import AccessDenied from "@/components/layout/AccessDenied";
 
-const navItems = [
+const kennelNavItems = [
   { href: "/painel", label: "Visão geral", icon: BarChart3 },
   { href: "/painel/perfil", label: "Perfil do canil", icon: User },
   { href: "/painel/filhotes", label: "Filhotes", icon: Dog },
@@ -18,6 +18,12 @@ const navItems = [
   { href: "/painel/avaliacoes", label: "Avaliações", icon: Star },
   { href: "/painel/comunidade", label: "Comunidade", icon: MessageCircle },
   { href: "/painel/parceiros", label: "Parceiros", icon: Stethoscope },
+  { href: "/painel/configuracoes", label: "Configurações", icon: Settings },
+];
+
+const clientNavItems = [
+  { href: "/painel", label: "Início", icon: BarChart3 },
+  { href: "/painel/favoritos", label: "Favoritos", icon: Heart },
   { href: "/painel/configuracoes", label: "Configurações", icon: Settings },
 ];
 
@@ -34,27 +40,42 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
     );
   }
 
-  if (!user || !isKennel) {
-    return <AccessDenied message="O painel de canil é exclusivo para criadores verificados." />;
+  if (!user) {
+    return <AccessDenied message="Faça login para acessar o painel." />;
   }
+
+  const navItems = isKennel ? kennelNavItems : clientNavItems;
+  const displayName = user.user_metadata?.full_name ?? user.email ?? "Usuário";
+  const initials = displayName
+    .split(" ")
+    .slice(0, 2)
+    .map((w: string) => w[0])
+    .join("")
+    .toUpperCase();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-lg">
-          GL
+          {initials}
         </div>
         <div>
-          <div className="flex items-center gap-2">
+          {isKennel ? (
+            <div className="flex items-center gap-2">
+              <h1 className="font-display text-xl font-semibold text-brand-900">
+                Painel do Criador
+              </h1>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-brand-600 to-brand-500 text-white">
+                <Gem className="w-2.5 h-2.5" />
+                Criador
+              </span>
+            </div>
+          ) : (
             <h1 className="font-display text-xl font-semibold text-brand-900">
-              Canil Good Leisure
+              Olá, {displayName.split(" ")[0]}
             </h1>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-brand-600 to-brand-500 text-white">
-              <Gem className="w-2.5 h-2.5" />
-              Elite
-            </span>
-          </div>
-          <p className="text-xs text-earth-500">São Lourenço da Serra, SP · 37 anos</p>
+          )}
+          <p className="text-xs text-earth-500">{user.email}</p>
         </div>
       </div>
 
@@ -63,7 +84,9 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
         <nav className="hidden md:block w-52 shrink-0">
           <div className="space-y-0.5">
             {navItems.map((item) => {
-              const active = pathname === item.href || (item.href !== "/painel" && pathname.startsWith(item.href));
+              const active =
+                pathname === item.href ||
+                (item.href !== "/painel" && pathname.startsWith(item.href));
               return (
                 <Link
                   key={item.href}

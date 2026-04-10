@@ -10,6 +10,7 @@ import {
 import { mockDonations } from "@/lib/mock-data";
 import type { Donation } from "@/types";
 import { useUser } from "@/lib/hooks/useUser";
+import { useRole } from "@/lib/hooks/useRole";
 
 const allBreeds = [
   "Golden Retriever", "Beagle", "Labrador Retriever", "Shih Tzu",
@@ -304,12 +305,13 @@ function CadastroModal({ onClose }: { onClose: () => void }) {
 
 export default function DoacoesPage() {
   const { user, loading } = useUser();
+  const { isKennel, loading: roleLoading } = useRole();
   const [showModal, setShowModal] = useState(false);
   const [breedFilter, setBreedFilter] = useState("");
   const [stateFilter, setStateFilter] = useState("");
   const [donorFilter, setDonorFilter] = useState<"all" | "kennel" | "individual">("all");
 
-  if (loading) return null;
+  if (loading || roleLoading) return null;
   if (!user) return <LoginGate />;
 
   const filtered = mockDonations.filter((d) => {
@@ -331,13 +333,15 @@ export default function DoacoesPage() {
             Cães disponíveis para adoção — criadores responsáveis e entusiastas de pet que precisam de ajuda.
           </p>
         </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-xl hover:bg-brand-700 transition-colors shrink-0"
-        >
-          <Plus className="w-4 h-4" />
-          Cadastrar
-        </button>
+        {isKennel && (
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-xl hover:bg-brand-700 transition-colors shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            Cadastrar
+          </button>
+        )}
       </div>
 
       {/* Aviso */}

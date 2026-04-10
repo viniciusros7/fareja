@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/hooks/useUser";
+import FavoriteButton from "@/components/FavoriteButton";
+import { useFavorites } from "@/lib/hooks/useFavorites";
 
 type KennelRow = {
   id: string;
@@ -40,7 +42,15 @@ function uuidSeed(id: string): number {
   return (parseInt(id.replace(/-/g, "").slice(0, 8), 16) % 90) + 10;
 }
 
-function KennelCard({ kennel }: { kennel: KennelRow }) {
+function KennelCard({
+  kennel,
+  favorited,
+  onToggleFavorite,
+}: {
+  kennel: KennelRow;
+  favorited: boolean;
+  onToggleFavorite: () => void;
+}) {
   const seed = uuidSeed(kennel.id);
 
   return (
@@ -57,17 +67,20 @@ function KennelCard({ kennel }: { kennel: KennelRow }) {
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         {kennel.plan === "super_premium" && (
-          <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-sm">
+          <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-sm">
             <Gem className="w-2.5 h-2.5" />
             Elite
           </span>
         )}
         {kennel.plan === "premium" && (
-          <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-600 text-white shadow-sm">
+          <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-600 text-white shadow-sm">
             <Sparkles className="w-2.5 h-2.5" />
             Premium
           </span>
         )}
+        <div className="absolute top-2 right-2">
+          <FavoriteButton favorited={favorited} onToggle={onToggleFavorite} />
+        </div>
       </div>
 
       <div className="p-4">
@@ -139,6 +152,7 @@ function KennelCard({ kennel }: { kennel: KennelRow }) {
 
 export default function CanisPage() {
   const { user } = useUser();
+  const { isFavorited, toggle } = useFavorites();
   const [kennels, setKennels] = useState<KennelRow[]>([]);
   const [breedNames, setBreedNames] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -380,7 +394,12 @@ export default function CanisPage() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {visibleKennels.map((kennel) => (
-              <KennelCard key={kennel.id} kennel={kennel} />
+              <KennelCard
+                key={kennel.id}
+                kennel={kennel}
+                favorited={isFavorited("kennel", kennel.id)}
+                onToggleFavorite={() => toggle("kennel", kennel.id)}
+              />
             ))}
           </div>
 
@@ -390,7 +409,7 @@ export default function CanisPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pointer-events-none select-none">
                 {filtered.slice(2, 8).map((kennel) => (
                   <div key={kennel.id} className="blur-sm opacity-60">
-                    <KennelCard kennel={kennel} />
+                    <KennelCard kennel={kennel} favorited={false} onToggleFavorite={() => {}} />
                   </div>
                 ))}
               </div>
