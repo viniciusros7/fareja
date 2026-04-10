@@ -365,3 +365,21 @@ create index idx_breeds_group on public.breeds(breed_group);
 -- Para executar o seed após criar a tabela, adicione a chave service_role ao .env.local:
 -- SUPABASE_SERVICE_ROLE_KEY=sua_chave_aqui
 -- Depois rode: npx tsx src/lib/seed-breeds.ts
+
+-- ============================================================
+-- FASE 7 — Colunas adicionais na tabela kennels
+-- ============================================================
+-- Execute no SQL Editor do Supabase (Dashboard → SQL Editor)
+-- Seguro de rodar mais de uma vez (ADD COLUMN IF NOT EXISTS)
+
+alter table public.kennels
+  add column if not exists latitude numeric,
+  add column if not exists longitude numeric,
+  add column if not exists offers_hotel boolean not null default false,
+  add column if not exists offers_transport boolean not null default false,
+  add column if not exists breeds_offered uuid[] default '{}',
+  add column if not exists whatsapp text;
+
+-- Índices adicionais
+create index if not exists idx_kennels_offers_hotel on public.kennels(offers_hotel);
+create index if not exists idx_kennels_offers_transport on public.kennels(offers_transport);

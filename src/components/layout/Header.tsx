@@ -6,7 +6,7 @@ import { Menu, X, Search, User, PawPrint, LogOut, ChevronDown } from "lucide-rea
 import { useUser } from "@/lib/hooks/useUser";
 
 const navLinks = [
-  { href: "/buscar", label: "Buscar canis" },
+  { href: "/canis", label: "Canis" },
   { href: "/racas", label: "Raças" },
   { href: "/encontrar-raca", label: "Qual raça?" },
   { href: "/doacoes", label: "Doações" },
