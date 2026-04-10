@@ -15,8 +15,12 @@ const navLinks = [
 ];
 
 function UserMenu() {
-  const { user, signOut } = useUser();
+  const { user, signOut, loading } = useUser();
   const [open, setOpen] = useState(false);
+
+  if (loading) {
+    return <div className="w-20 h-8 rounded-full bg-earth-100 animate-pulse" />;
+  }
 
   if (!user) {
     return (
@@ -91,7 +95,7 @@ function UserMenu() {
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user, signOut } = useUser();
+  const { user, signOut, loading } = useUser();
 
   const name = user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? user?.email ?? "";
   const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture ?? null;
@@ -157,7 +161,9 @@ export default function Header() {
             </Link>
           ))}
           <div className="pt-3 border-t border-earth-200 mt-3">
-            {user ? (
+            {loading ? (
+              <div className="h-12 rounded-lg bg-earth-100 animate-pulse mx-2" />
+            ) : user ? (
               <div className="space-y-1">
                 <div className="flex items-center gap-3 px-4 py-2">
                   {avatarUrl ? (

@@ -151,7 +151,7 @@ function KennelCard({
 }
 
 export default function CanisPage() {
-  const { user } = useUser();
+  const { user, loading: authLoading } = useUser();
   const { isFavorited, toggle } = useFavorites();
   const [kennels, setKennels] = useState<KennelRow[]>([]);
   const [breedNames, setBreedNames] = useState<string[]>([]);
@@ -231,7 +231,7 @@ export default function CanisPage() {
     setSortBy("rating");
   }
 
-  const visibleKennels = user ? filtered : filtered.slice(0, 2);
+  const visibleKennels = user || authLoading ? filtered : filtered.slice(0, 2);
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
@@ -404,7 +404,7 @@ export default function CanisPage() {
           </div>
 
           {/* Blur gate para não-logados */}
-          {!user && filtered.length > 2 && (
+          {!authLoading && !user && filtered.length > 2 && (
             <div className="relative mt-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pointer-events-none select-none">
                 {filtered.slice(2, 8).map((kennel) => (

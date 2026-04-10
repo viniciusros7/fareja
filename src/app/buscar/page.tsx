@@ -29,7 +29,7 @@ const energyLabels: Record<string, string> = { low: "Baixa", medium: "Média", h
 const groomingLabels: Record<string, string> = { low: "Pouca", medium: "Média", high: "Muita" };
 
 export default function BuscarPage() {
-  const { user } = useUser();
+  const { user, loading: authLoading } = useUser();
   const [query, setQuery] = useState("");
   const [breed, setBreed] = useState("");
   const [state, setState] = useState("");
@@ -409,12 +409,12 @@ export default function BuscarPage() {
 
       {/* Results */}
       <div className="space-y-3">
-        {(user ? filtered : filtered.slice(0, 2)).map((kennel) => (
+        {(user || authLoading ? filtered : filtered.slice(0, 2)).map((kennel) => (
           <KennelCard key={kennel.id} kennel={kennel} />
         ))}
 
         {/* Blur gate after 2nd result */}
-        {!user && filtered.length > 2 && (
+        {!authLoading && !user && filtered.length > 2 && (
           <div className="relative">
             <div className="space-y-3 pointer-events-none select-none">
               {filtered.slice(2).map((kennel) => (
