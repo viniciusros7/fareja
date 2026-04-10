@@ -50,4 +50,4 @@ SELECT id, email, full_name, role, created_at FROM public.profiles ORDER BY crea
 Rotas protegidas:
 - `/admin/aprovar` → `approver` ou `super_admin`
 - `/admin/financeiro` → `super_admin` apenas
-- `/painel/*` → `kennel` apenas
+- `/painel/*` → `kennel` ou `super_admin`

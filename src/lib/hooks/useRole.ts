@@ -43,6 +43,6 @@ export function useRole(): UseRoleReturn {
     loading: userLoading || roleLoading,
     isAdmin: role === "super_admin",
     isApprover: role === "approver" || role === "super_admin",
-    isKennel: role === "kennel",
+    isKennel: role === "kennel" || role === "super_admin",
   };
 }
