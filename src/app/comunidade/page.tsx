@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   Image as ImageIcon, MessageCircle, AtSign,
-  PawPrint, Clock,
+  PawPrint,
 } from "lucide-react";
 
 export default function ComunidadePage() {
@@ -109,24 +109,45 @@ export default function ComunidadePage() {
         </div>
       )}
 
-      {/* Forum tab — Em breve */}
+      {/* Forum tab */}
       {tab === "forum" && (
-        <div className="text-center py-16">
-          <div className="w-16 h-16 rounded-2xl bg-earth-100 flex items-center justify-center mx-auto mb-5">
-            <Clock className="w-7 h-7 text-earth-400" />
-          </div>
-          <h2 className="font-display text-lg font-semibold text-earth-800 mb-2">
-            Fórum em breve
-          </h2>
-          <p className="text-sm text-earth-500 max-w-xs mx-auto leading-relaxed">
-            O fórum de discussões está sendo construído. Acompanhe as novidades no feed enquanto isso.
+        <div className="space-y-4">
+          <p className="text-sm text-earth-500">
+            Perguntas, dicas e discussões sobre cães, raças e criadores.
           </p>
-          <button
-            onClick={() => setTab("feed")}
-            className="mt-6 px-5 py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors"
+          <Link
+            href="/comunidade/forum"
+            className="flex items-center gap-4 p-5 rounded-xl border border-earth-200 bg-white hover:border-brand-300 hover:shadow-sm transition-all group"
           >
-            Ver feed
-          </button>
+            <div className="w-12 h-12 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center group-hover:bg-brand-200 transition-colors shrink-0">
+              <MessageCircle className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-earth-900 group-hover:text-brand-600 transition-colors">
+                Abrir fórum
+              </div>
+              <div className="text-xs text-earth-400 mt-0.5">
+                Categorias, tópicos e respostas da comunidade
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            href="/comunidade/forum/novo"
+            className="flex items-center gap-4 p-5 rounded-xl border border-dashed border-brand-300 bg-brand-50 hover:bg-brand-100 transition-colors group"
+          >
+            <div className="w-12 h-12 rounded-xl bg-brand-200 text-brand-600 flex items-center justify-center shrink-0">
+              <PawPrint className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-brand-700">
+                Fazer uma pergunta
+              </div>
+              <div className="text-xs text-brand-500 mt-0.5">
+                Compartilhe sua dúvida com a comunidade
+              </div>
+            </div>
+          </Link>
         </div>
       )}
     </div>
