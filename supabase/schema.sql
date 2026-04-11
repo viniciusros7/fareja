@@ -512,3 +512,139 @@ drop trigger if exists on_post_comment_feed_changed on public.post_comments;
 create trigger on_post_comment_feed_changed
   after insert or delete on public.post_comments
   for each row execute function public.sync_post_comment_count();
+
+-- ============================================================
+-- FASE 9C — FÓRUM
+-- ============================================================
+
+-- Categorias do fórum
+create table public.forum_categories (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  slug text not null unique,
+  description text,
+  icon text,
+  topics_count int not null default 0,
+  created_at timestamptz not null default now()
+);
+alter table public.forum_categories enable row level security;
+create policy "forum_categories_select" on public.forum_categories for select using (true);
+create policy "forum_categories_insert" on public.forum_categories for insert with check (
+  exists (select 1 from public.profiles where id = auth.uid() and role in ('approver','super_admin'))
+);
+
+-- Seed das 7 categorias
+insert into public.forum_categories (name, slug, description, icon) values
+  ('Saúde e Nutrição',            'saude-e-nutricao',            'Dúvidas sobre alimentação, vacinas e saúde geral', 'Heart'),
+  ('Comportamento e Adestramento','comportamento-e-adestramento','Dicas de treino, socialização e comportamento',    'Brain'),
+  ('Raças e Escolha do Filhote',  'racas-e-escolha-do-filhote',  'Compare raças e tire dúvidas sobre adoção',        'Search'),
+  ('Cuidados e Higiene',          'cuidados-e-higiene',          'Banho, tosa, unhas e cuidados do dia a dia',       'Scissors'),
+  ('Reprodução e Criação',        'reproducao-e-criacao',        'Para criadores — cobrição, ninhadas e pedigree',   'Star'),
+  ('Espaço do Criador',           'espaco-do-criador',           'Vitrine e novidades dos canis verificados',        'Home'),
+  ('Off-topic e Apresentações',   'off-topic-e-apresentacoes',   'Apresente seu pet e papo livre',                   'MessageCircle');
+
+-- Tópicos do fórum
+create table public.forum_topics (
+  id uuid primary key default gen_random_uuid(),
+  category_id uuid not null references public.forum_categories(id) on delete cascade,
+  author_id uuid not null references public.profiles(id) on delete cascade,
+  title text not null,
+  content text not null,
+  images text[] not null default '{}',
+  views_count int not null default 0,
+  replies_count int not null default 0,
+  likes_count int not null default 0,
+  is_pinned boolean not null default false,
+  is_solved boolean not null default false,
+  status text not null default 'open' check (status in ('open','closed')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+alter table public.forum_topics enable row level security;
+create policy "forum_topics_select" on public.forum_topics for select using (true);
+create policy "forum_topics_insert" on public.forum_topics for insert with check (auth.uid() = author_id);
+create policy "forum_topics_update" on public.forum_topics for update using (
+  auth.uid() = author_id or
+  exists (select 1 from public.profiles where id = auth.uid() and role in ('approver','super_admin'))
+);
+create policy "forum_topics_delete" on public.forum_topics for delete using (
+  auth.uid() = author_id or
+  exists (select 1 from public.profiles where id = auth.uid() and role in ('approver','super_admin'))
+);
+create index forum_topics_category_created on public.forum_topics(category_id, created_at desc);
+create index forum_topics_pinned on public.forum_topics(category_id, is_pinned desc, created_at desc);
+
+-- Respostas do fórum
+create table public.forum_replies (
+  id uuid primary key default gen_random_uuid(),
+  topic_id uuid not null references public.forum_topics(id) on delete cascade,
+  author_id uuid not null references public.profiles(id) on delete cascade,
+  content text not null,
+  images text[] not null default '{}',
+  likes_count int not null default 0,
+  is_best_answer boolean not null default false,
+  created_at timestamptz not null default now()
+);
+alter table public.forum_replies enable row level security;
+create policy "forum_replies_select" on public.forum_replies for select using (true);
+create policy "forum_replies_insert" on public.forum_replies for insert with check (auth.uid() = author_id);
+create policy "forum_replies_update" on public.forum_replies for update using (
+  auth.uid() = author_id or
+  exists (select 1 from public.forum_topics where id = topic_id and author_id = auth.uid()) or
+  exists (select 1 from public.profiles where id = auth.uid() and role in ('approver','super_admin'))
+);
+create policy "forum_replies_delete" on public.forum_replies for delete using (
+  auth.uid() = author_id or
+  exists (select 1 from public.profiles where id = auth.uid() and role in ('approver','super_admin'))
+);
+create index forum_replies_topic_created on public.forum_replies(topic_id, created_at asc);
+
+-- Curtidas de tópicos
+create table public.forum_topic_likes (
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  topic_id uuid not null references public.forum_topics(id) on delete cascade,
+  primary key (user_id, topic_id)
+);
+alter table public.forum_topic_likes enable row level security;
+create policy "forum_topic_likes_all" on public.forum_topic_likes using (auth.uid() = user_id);
+
+-- Curtidas de respostas
+create table public.forum_reply_likes (
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  reply_id uuid not null references public.forum_replies(id) on delete cascade,
+  primary key (user_id, reply_id)
+);
+alter table public.forum_reply_likes enable row level security;
+create policy "forum_reply_likes_all" on public.forum_reply_likes using (auth.uid() = user_id);
+
+-- Trigger: mantém topics_count sincronizado em forum_categories
+create or replace function public.sync_category_topics_count()
+returns trigger language plpgsql security definer as $$
+begin
+  if TG_OP = 'INSERT' then
+    update public.forum_categories set topics_count = topics_count + 1 where id = NEW.category_id;
+  elsif TG_OP = 'DELETE' then
+    update public.forum_categories set topics_count = greatest(topics_count - 1, 0) where id = OLD.category_id;
+  end if;
+  return null;
+end;
+$$;
+create trigger trg_forum_topics_count
+  after insert or delete on public.forum_topics
+  for each row execute function public.sync_category_topics_count();
+
+-- Trigger: mantém replies_count sincronizado em forum_topics
+create or replace function public.sync_topic_replies_count()
+returns trigger language plpgsql security definer as $$
+begin
+  if TG_OP = 'INSERT' then
+    update public.forum_topics set replies_count = replies_count + 1, updated_at = now() where id = NEW.topic_id;
+  elsif TG_OP = 'DELETE' then
+    update public.forum_topics set replies_count = greatest(replies_count - 1, 0) where id = OLD.topic_id;
+  end if;
+  return null;
+end;
+$$;
+create trigger trg_forum_replies_count
+  after insert or delete on public.forum_replies
+  for each row execute function public.sync_topic_replies_count();
