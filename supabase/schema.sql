@@ -648,3 +648,27 @@ $$;
 create trigger trg_forum_replies_count
   after insert or delete on public.forum_replies
   for each row execute function public.sync_topic_replies_count();
+
+-- ============================================================
+-- FASE 12 — PERFIL, NOTIFICAÇÕES, PRIVACIDADE
+-- ============================================================
+
+alter table public.profiles
+  add column if not exists bio text,
+  add column if not exists privacy_accepted boolean not null default false,
+  add column if not exists privacy_accepted_at timestamptz;
+
+create table public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  type text not null check (type in ('comment_reply', 'new_post', 'kennel_update', 'admin_alert')),
+  content text not null,
+  link text,
+  read boolean not null default false,
+  created_at timestamptz not null default now()
+);
+alter table public.notifications enable row level security;
+create policy "notifications_select" on public.notifications for select using (auth.uid() = user_id);
+create policy "notifications_update" on public.notifications for update using (auth.uid() = user_id);
+create index notifications_user_created on public.notifications(user_id, created_at desc);
+create index notifications_user_unread on public.notifications(user_id, read) where read = false;

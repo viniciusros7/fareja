@@ -18,11 +18,14 @@ export function useUser(): UseUserReturn {
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user ?? null);
+    // getSession() lê dos cookies/localStorage sem chamada de rede —
+    // evita o flash de "não autenticado" após o redirect do OAuth callback.
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user ?? null);
       setLoading(false);
     });
 
+    // onAuthStateChange cobre SIGNED_IN, SIGNED_OUT e TOKEN_REFRESHED.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);

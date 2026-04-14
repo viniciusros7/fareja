@@ -4,8 +4,10 @@ import Link from "next/link";
 import {
   CheckCircle2, Star, ArrowRight, ShieldCheck, TrendingUp,
   Users, PenLine, Sparkles, PawPrint, Zap, Crown,
-  Stethoscope, Store, MessageCircle, Camera, Gem,
+  Stethoscope, Store, MessageCircle, Camera, Gem, Lock, Loader2,
 } from "lucide-react";
+import { useUser } from "@/lib/hooks/useUser";
+import { useRole } from "@/lib/hooks/useRole";
 
 const plans = [
   {
@@ -107,6 +109,39 @@ const steps = [
 ];
 
 export default function ParaCriadoresPage() {
+  const { user, loading: userLoading } = useUser();
+  const { role, loading: roleLoading } = useRole();
+
+  if (userLoading || roleLoading) {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-earth-400" />
+      </div>
+    );
+  }
+
+  if (user && role === "client") {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 py-12 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-earth-100 flex items-center justify-center mb-4">
+          <Lock className="w-7 h-7 text-earth-400" />
+        </div>
+        <h2 className="font-display text-xl font-semibold text-earth-900 mb-2">
+          Esta área é exclusiva para criadores verificados do Fareja.
+        </h2>
+        <p className="text-sm text-earth-500 max-w-sm mx-auto mb-6 leading-relaxed">
+          Para cadastrar seu canil na plataforma, preencha o formulário de interesse e nossa equipe entrará em contato.
+        </p>
+        <Link
+          href="/para-criadores/cadastro"
+          className="px-6 py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors"
+        >
+          Quero cadastrar meu canil
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-hidden">
       {/* Hero */}

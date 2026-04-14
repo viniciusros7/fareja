@@ -231,7 +231,7 @@ export default function CanisPage() {
     setSortBy("rating");
   }
 
-  const visibleKennels = user || authLoading ? filtered : filtered.slice(0, 2);
+  const visibleKennels = user || authLoading ? filtered : filtered.slice(0, 3);
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
@@ -404,10 +404,10 @@ export default function CanisPage() {
           </div>
 
           {/* Blur gate para não-logados */}
-          {!authLoading && !user && filtered.length > 2 && (
+          {!authLoading && !user && filtered.length > 3 && (
             <div className="relative mt-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pointer-events-none select-none">
-                {filtered.slice(2, 8).map((kennel) => (
+                {filtered.slice(3, 9).map((kennel) => (
                   <div key={kennel.id} className="blur-sm opacity-60">
                     <KennelCard kennel={kennel} favorited={false} onToggleFavorite={() => {}} />
                   </div>
@@ -419,16 +419,16 @@ export default function CanisPage() {
                     <Lock className="w-5 h-5 text-brand-600" />
                   </div>
                   <h3 className="text-base font-semibold text-earth-900 mb-1">
-                    Veja todos os canis verificados
+                    Quer conhecer todos os canis verificados?
                   </h3>
                   <p className="text-xs text-earth-500 mb-4 leading-relaxed">
-                    Você está vendo 2 de {filtered.length} canis. Crie sua conta grátis para acessar a lista completa.
+                    Você está vendo 3 de {filtered.length} canis. Crie sua conta grátis para acessar a lista completa.
                   </p>
                   <Link
                     href="/login"
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors"
                   >
-                    Criar conta grátis
+                    Criar conta
                   </Link>
                 </div>
               </div>
