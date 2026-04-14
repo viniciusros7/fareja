@@ -8,11 +8,10 @@ import {
 } from "lucide-react";
 import { useRole } from "@/lib/hooks/useRole";
 import { useUser } from "@/lib/hooks/useUser";
-import AccessDenied from "@/components/layout/AccessDenied";
 
 const kennelNavItems = [
   { href: "/painel", label: "Visão geral", icon: BarChart3 },
-  { href: "/painel/perfil", label: "Perfil do canil", icon: User },
+  { href: "/painel/perfil", label: "Perfil", icon: User },
   { href: "/painel/filhotes", label: "Filhotes", icon: Dog },
   { href: "/painel/reprodutores", label: "Reprodutores", icon: PawPrint },
   { href: "/painel/avaliacoes", label: "Avaliações", icon: Star },
@@ -23,6 +22,7 @@ const kennelNavItems = [
 
 const clientNavItems = [
   { href: "/painel", label: "Início", icon: BarChart3 },
+  { href: "/painel/perfil", label: "Perfil", icon: User },
   { href: "/painel/favoritos", label: "Favoritos", icon: Heart },
   { href: "/painel/configuracoes", label: "Configurações", icon: Settings },
 ];
@@ -41,7 +41,31 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
   }
 
   if (!user) {
-    return <AccessDenied message="Faça login para acessar o painel." />;
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 py-12 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-brand-100 flex items-center justify-center mb-4">
+          <PawPrint className="w-7 h-7 text-brand-600" />
+        </div>
+        <h2 className="font-display text-xl font-semibold text-earth-900 mb-2">
+          Entre para gerenciar seu perfil e favoritos
+        </h2>
+        <p className="text-sm text-earth-500 max-w-sm mx-auto mb-5 leading-relaxed">
+          Acesse seu painel, gerencie favoritos e acompanhe suas atividades.
+        </p>
+        <Link
+          href="/login"
+          className="px-6 py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors"
+        >
+          Entrar
+        </Link>
+        <p className="mt-3 text-xs text-earth-400">
+          Não tem conta?{" "}
+          <Link href="/login" className="text-brand-600 hover:underline font-medium">
+            Criar conta grátis
+          </Link>
+        </p>
+      </div>
+    );
   }
 
   const navItems = isKennel ? kennelNavItems : clientNavItems;

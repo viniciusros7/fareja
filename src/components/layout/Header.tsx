@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu, X, Search, User, PawPrint, LogOut, ChevronDown } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
+import { useRole } from "@/lib/hooks/useRole";
 
-const navLinks = [
+const allNavLinks = [
   { href: "/canis", label: "Canis" },
   { href: "/racas", label: "Raças" },
   { href: "/encontrar-raca", label: "Qual raça?" },
@@ -96,6 +97,15 @@ function UserMenu() {
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, signOut, loading } = useUser();
+  const { role } = useRole();
+
+  // Clientes logados não veem "Para criadores"
+  const navLinks = allNavLinks.filter((link) => {
+    if (link.href === "/para-criadores") {
+      return !user || role !== "client";
+    }
+    return true;
+  });
 
   const name = user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? user?.email ?? "";
   const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture ?? null;

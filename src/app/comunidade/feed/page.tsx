@@ -7,8 +7,9 @@ import PostCard, { type FeedPost } from "@/components/community/PostCard";
 import CreatePostButton from "@/components/community/CreatePostButton";
 import { useUser } from "@/lib/hooks/useUser";
 import { createClient } from "@/lib/supabase/client";
+import AuthGate from "@/components/AuthGate";
 
-export default function FeedPage() {
+function FeedContent() {
   const { user, loading: authLoading } = useUser();
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
@@ -138,5 +139,13 @@ export default function FeedPage() {
 
       {!authLoading && <CreatePostButton />}
     </div>
+  );
+}
+
+export default function FeedPage() {
+  return (
+    <AuthGate loginMessage="Veja o que os melhores criadores do Brasil estão compartilhando">
+      <FeedContent />
+    </AuthGate>
   );
 }
