@@ -149,10 +149,10 @@ export default function TermosPage() {
           <p className="leading-relaxed">
             Para dúvidas sobre estes Termos, entre em contato pelo e-mail:{" "}
             <a
-              href="mailto:contato@fareja.com.br"
+              href="mailto:contato@fareja.app.br"
               className="text-brand-600 hover:underline"
             >
-              contato@fareja.com.br
+              contato@fareja.app.br
             </a>
           </p>
         </section>

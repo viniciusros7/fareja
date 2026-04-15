@@ -31,8 +31,8 @@ export default function PrivacidadePage() {
             A <strong>Fareja</strong> é o controlador dos dados pessoais coletados nesta
             Plataforma. Para questões relacionadas a dados pessoais, entre em contato com
             nosso Encarregado de Proteção de Dados (DPO) pelo e-mail:{" "}
-            <a href="mailto:privacidade@fareja.com.br" className="text-brand-600 hover:underline">
-              privacidade@fareja.com.br
+            <a href="mailto:privacidade@fareja.app.br" className="text-brand-600 hover:underline">
+              privacidade@fareja.app.br
             </a>
           </p>
         </section>
@@ -167,8 +167,8 @@ export default function PrivacidadePage() {
           </ul>
           <p className="leading-relaxed mt-3">
             Para exercer qualquer desses direitos, entre em contato com nosso DPO em{" "}
-            <a href="mailto:privacidade@fareja.com.br" className="text-brand-600 hover:underline">
-              privacidade@fareja.com.br
+            <a href="mailto:privacidade@fareja.app.br" className="text-brand-600 hover:underline">
+              privacidade@fareja.app.br
             </a>
             . Responderemos em até 15 dias úteis.
           </p>
@@ -229,13 +229,13 @@ export default function PrivacidadePage() {
           </h2>
           <p className="leading-relaxed">
             Encarregado de Proteção de Dados (DPO):{" "}
-            <a href="mailto:privacidade@fareja.com.br" className="text-brand-600 hover:underline">
-              privacidade@fareja.com.br
+            <a href="mailto:privacidade@fareja.app.br" className="text-brand-600 hover:underline">
+              privacidade@fareja.app.br
             </a>
             <br />
             Para demais assuntos:{" "}
-            <a href="mailto:contato@fareja.com.br" className="text-brand-600 hover:underline">
-              contato@fareja.com.br
+            <a href="mailto:contato@fareja.app.br" className="text-brand-600 hover:underline">
+              contato@fareja.app.br
             </a>
           </p>
           <p className="leading-relaxed mt-2 text-earth-500">

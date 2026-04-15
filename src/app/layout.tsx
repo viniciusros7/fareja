@@ -6,6 +6,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import PrivacyModal from "@/components/PrivacyModal";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://fareja.app.br"),
   title: "Fareja – Canis Verificados do Brasil",
   description:
     "Encontre canis verificados com procedência comprovada. Filhotes saudáveis, microchipados e com origem rastreável.",
@@ -13,8 +14,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Fareja – Canis Verificados do Brasil",
     description: "A primeira plataforma brasileira de canis verificados.",
+    url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://fareja.app.br",
     type: "website",
     locale: "pt_BR",
+    siteName: "Fareja",
   },
 };
 

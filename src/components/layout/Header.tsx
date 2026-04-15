@@ -97,12 +97,13 @@ function UserMenu() {
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, signOut, loading } = useUser();
-  const { role } = useRole();
+  const { role, loading: roleLoading } = useRole();
 
   // Apenas kennel/approver/super_admin veem "Para criadores"
+  // Esconder enquanto role ainda carrega para evitar flash para role=client
   const navLinks = allNavLinks.filter((link) => {
     if (link.href === "/para-criadores") {
-      return !!user && role !== "client";
+      return !!user && !roleLoading && role !== null && role !== "client";
     }
     return true;
   });
