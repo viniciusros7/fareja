@@ -61,7 +61,7 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-earth-800 mb-3">Siga a Fareja</h4>
             <a
-              href="https://instagram.com/fareja"
+              href={process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://instagram.com/fareja"}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand-100 text-brand-600 rounded-full text-sm font-medium hover:bg-brand-200 transition-colors"

@@ -17,7 +17,9 @@ export default function LoginPage() {
   const supabase = createClient();
 
   async function handleOAuth(provider: "google" | "apple" | "azure") {
-    const callbackUrl = `${window.location.origin}/auth/callback`;
+    const callbackUrl = process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      : `${window.location.origin}/auth/callback`;
     setLoadingProvider(provider);
     setError(null);
     const { error } = await supabase.auth.signInWithOAuth({
@@ -33,7 +35,9 @@ export default function LoginPage() {
   async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
-    const callbackUrl = `${window.location.origin}/auth/callback`;
+    const callbackUrl = process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      : `${window.location.origin}/auth/callback`;
     setLoadingProvider("email");
     setError(null);
     const { error } = await supabase.auth.signInWithOtp({

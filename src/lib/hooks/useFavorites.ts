@@ -15,6 +15,7 @@ export function useFavorites() {
   const { user } = useUser();
   const [favorites, setFavorites] = useState<FavoriteRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -28,8 +29,12 @@ export function useFavorites() {
       .from("favorites")
       .select("breed_id, kennel_id")
       .eq("user_id", user.id)
-      .then(({ data }) => {
-        setFavorites((data as FavoriteRow[]) ?? []);
+      .then(({ data, error: err }) => {
+        if (err) {
+          setError(err.message);
+        } else {
+          setFavorites((data as FavoriteRow[]) ?? []);
+        }
         setLoading(false);
       });
   }, [user]);
@@ -72,5 +77,5 @@ export function useFavorites() {
     [user, isFavorited]
   );
 
-  return { favorites, loading, isFavorited, toggle };
+  return { favorites, loading, error, isFavorited, toggle };
 }

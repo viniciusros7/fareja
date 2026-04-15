@@ -30,7 +30,7 @@ const clientNavItems = [
 export default function PainelLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, loading: userLoading } = useUser();
-  const { loading: roleLoading, isKennel } = useRole();
+  const { loading: roleLoading, isKennel, isApprover } = useRole();
 
   if (userLoading || roleLoading) {
     return (
@@ -68,7 +68,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
     );
   }
 
-  const navItems = isKennel ? kennelNavItems : clientNavItems;
+  const navItems = (isKennel || isApprover) ? kennelNavItems : clientNavItems;
   const displayName = user.user_metadata?.full_name ?? user.email ?? "Usuário";
   const initials = displayName
     .split(" ")
@@ -84,7 +84,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
           {initials}
         </div>
         <div>
-          {isKennel ? (
+          {(isKennel || isApprover) ? (
             <div className="flex items-center gap-2">
               <h1 className="font-display text-xl font-semibold text-brand-900">
                 Painel do Criador

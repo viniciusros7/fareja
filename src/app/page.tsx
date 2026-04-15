@@ -259,7 +259,7 @@ export default function HomePage() {
               os filhotes mais fofos do Brasil.
             </p>
             <a
-              href="https://instagram.com/fareja"
+              href={process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://instagram.com/fareja"}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-sm font-semibold text-pink-600 hover:text-pink-700 transition-colors"

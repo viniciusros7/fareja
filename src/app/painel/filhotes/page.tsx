@@ -57,6 +57,7 @@ export default function FilhotesPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [breedSuggestions, setBreedSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -76,6 +77,14 @@ export default function FilhotesPage() {
       }
 
       setKennelId(kennel.id);
+
+      const { data: breedsData } = await supabase
+        .from("breeds")
+        .select("name_pt")
+        .order("name_pt");
+      if (breedsData) {
+        setBreedSuggestions(breedsData.map((b: { name_pt: string }) => b.name_pt).filter(Boolean));
+      }
 
       const { data } = await supabase
         .from("puppies")
@@ -254,8 +263,16 @@ export default function FilhotesPage() {
                 value={form.breed}
                 onChange={(e) => setForm({ ...form, breed: e.target.value })}
                 placeholder="Ex: Golden Retriever"
+                list="breeds-list"
                 className="w-full px-3 py-2 text-sm border border-earth-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400/30"
               />
+              {breedSuggestions.length > 0 && (
+                <datalist id="breeds-list">
+                  {breedSuggestions.map((b) => (
+                    <option key={b} value={b} />
+                  ))}
+                </datalist>
+              )}
             </div>
             <div>
               <label className="block text-xs font-medium text-earth-600 mb-1">Sexo</label>

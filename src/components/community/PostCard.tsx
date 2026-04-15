@@ -69,12 +69,16 @@ export default function PostCard({ post, liked, onLikeToggle, onDelete }: PostCa
     const newLiked = !liked;
     const newCount = post.likes_count + (newLiked ? 1 : -1);
     onLikeToggle(post.id, newLiked, newCount);
-    await fetch(`/api/posts/${post.id}/like`, { method: "POST" });
+    const res = await fetch(`/api/posts/${post.id}/like`, { method: "POST" });
+    if (!res.ok) {
+      onLikeToggle(post.id, liked, post.likes_count);
+    }
   }
 
   async function handleDelete() {
     setMenuOpen(false);
-    await fetch(`/api/posts/${post.id}`, { method: "DELETE" });
+    const res = await fetch(`/api/posts/${post.id}`, { method: "DELETE" });
+    if (!res.ok) return;
     onDelete?.(post.id);
   }
 

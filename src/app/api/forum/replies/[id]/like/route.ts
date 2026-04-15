@@ -13,36 +13,17 @@ export async function POST(
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
   }
 
-  const { data: existing } = await supabase
-    .from("forum_reply_likes")
-    .select("reply_id")
-    .eq("reply_id", id)
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("toggle_reply_like", {
+    p_reply_id: id,
+    p_user_id: user.id,
+  });
 
-  const { data: reply } = await supabase
-    .from("forum_replies")
-    .select("likes_count")
-    .eq("id", id)
-    .single();
-
-  if (!reply) {
-    return NextResponse.json({ error: "Resposta não encontrada" }, { status: 404 });
+  if (error || !data?.[0]) {
+    return NextResponse.json(
+      { error: error?.message ?? "Erro ao processar like" },
+      { status: 500 }
+    );
   }
 
-  if (existing) {
-    await supabase.from("forum_reply_likes").delete().eq("reply_id", id).eq("user_id", user.id);
-    await supabase
-      .from("forum_replies")
-      .update({ likes_count: Math.max(0, reply.likes_count - 1) })
-      .eq("id", id);
-    return NextResponse.json({ liked: false, likes_count: Math.max(0, reply.likes_count - 1) });
-  }
-
-  await supabase.from("forum_reply_likes").insert({ reply_id: id, user_id: user.id });
-  await supabase
-    .from("forum_replies")
-    .update({ likes_count: reply.likes_count + 1 })
-    .eq("id", id);
-  return NextResponse.json({ liked: true, likes_count: reply.likes_count + 1 });
+  return NextResponse.json({ liked: data[0].liked, likes_count: data[0].likes_count });
 }

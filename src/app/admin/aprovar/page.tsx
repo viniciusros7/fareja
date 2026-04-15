@@ -13,6 +13,19 @@ import { useUser } from "@/lib/hooks/useUser";
 import AccessDenied from "@/components/layout/AccessDenied";
 import { createClient } from "@/lib/supabase/client";
 
+async function adminFetch(url: string, body: Record<string, unknown>): Promise<{ error?: string }> {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    return { error: data.error ?? `Erro ${res.status}` };
+  }
+  return {};
+}
+
 interface PendingKennel {
   id: string;
   name: string;
@@ -141,30 +154,16 @@ export default function AdminAprovarPage() {
   }
 
   async function handleApprove(kennel: PendingKennel) {
-    if (!user) return;
     setActionLoading(kennel.id);
-    const supabase = createClient();
-
-    const { error } = await supabase
-      .from("kennels")
-      .update({
-        status: "approved",
-        verified_at: new Date().toISOString(),
-        reviewed_by: user.id,
-      })
-      .eq("id", kennel.id);
+    const { error } = await adminFetch("/api/admin/approve", {
+      kennel_id: kennel.id,
+      owner_id: kennel.owner?.id ?? null,
+    });
 
     if (error) {
-      showToast(`Erro ao aprovar: ${error.message}`);
+      showToast(`Erro ao aprovar: ${error}`);
       setActionLoading(null);
       return;
-    }
-
-    if (kennel.owner?.id) {
-      await supabase
-        .from("profiles")
-        .update({ role: "kennel" })
-        .eq("id", kennel.owner.id);
     }
 
     setPending((prev) => prev.filter((k) => k.id !== kennel.id));
@@ -174,21 +173,15 @@ export default function AdminAprovarPage() {
   }
 
   async function handleReject(kennel: PendingKennel) {
-    if (!user || !rejectReason.trim()) return;
+    if (!rejectReason.trim()) return;
     setActionLoading(kennel.id);
-    const supabase = createClient();
-
-    const { error } = await supabase
-      .from("kennels")
-      .update({
-        status: "rejected",
-        rejected_reason: rejectReason.trim(),
-        reviewed_by: user.id,
-      })
-      .eq("id", kennel.id);
+    const { error } = await adminFetch("/api/admin/reject", {
+      kennel_id: kennel.id,
+      reason: rejectReason.trim(),
+    });
 
     if (error) {
-      showToast(`Erro ao rejeitar: ${error.message}`);
+      showToast(`Erro ao rejeitar: ${error}`);
       setActionLoading(null);
       return;
     }

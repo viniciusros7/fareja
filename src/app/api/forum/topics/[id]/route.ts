@@ -25,12 +25,10 @@ export async function GET(
     return NextResponse.json({ error: "Tópico não encontrado" }, { status: 404 });
   }
 
-  // increment views (fire and forget)
-  supabase
-    .from("forum_topics")
-    .update({ views_count: topic.views_count + 1 })
-    .eq("id", id)
-    .then(() => {});
+  // increment views atomically (fire and forget — non-critical counter)
+  supabase.rpc("increment_topic_views", { topic_id: id }).then(({ error }) => {
+    if (error) console.error("[views_count] increment failed:", id, error.message);
+  });
 
   return NextResponse.json({ topic });
 }
