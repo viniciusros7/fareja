@@ -60,24 +60,54 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (
+      !process.env.R2_ACCOUNT_ID ||
+      !process.env.R2_ACCESS_KEY_ID ||
+      !process.env.R2_SECRET_ACCESS_KEY ||
+      !process.env.R2_BUCKET_NAME ||
+      !process.env.R2_PUBLIC_URL
+    ) {
+      return NextResponse.json(
+        { error: "Serviço de upload não configurado" },
+        { status: 503 }
+      );
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer());
     const rand = randomBytes(6).toString("hex");
     const ts = Date.now();
 
-    if (isImage) {
-      const compressed = await compressImage(buffer, "post");
-      const key = `posts/${user.id}/${ts}-${rand}.webp`;
-      const url = await uploadFile(compressed, key, "image/webp");
+    try {
+      if (isImage) {
+        let compressed: Buffer;
+        try {
+          compressed = await compressImage(buffer, "post");
+        } catch {
+          compressed = buffer;
+        }
+        const key = `posts/${user.id}/${ts}-${rand}.webp`;
+        const url = await uploadFile(compressed, key, "image/webp");
 
-      const thumb = await compressImage(buffer, "thumbnail");
-      const thumbKey = `posts/${user.id}/${ts}-${rand}-thumb.webp`;
-      const thumbnailUrl = await uploadFile(thumb, thumbKey, "image/webp");
+        let thumb: Buffer;
+        try {
+          thumb = await compressImage(buffer, "thumbnail");
+        } catch {
+          thumb = buffer;
+        }
+        const thumbKey = `posts/${user.id}/${ts}-${rand}-thumb.webp`;
+        const thumbnailUrl = await uploadFile(thumb, thumbKey, "image/webp");
 
-      results.push({ url, thumbnailUrl, key });
-    } else {
-      const key = `posts/${user.id}/${ts}-${rand}.mp4`;
-      const url = await uploadFile(buffer, key, "video/mp4");
-      results.push({ url, key });
+        results.push({ url, thumbnailUrl, key });
+      } else {
+        const key = `posts/${user.id}/${ts}-${rand}.mp4`;
+        const url = await uploadFile(buffer, key, "video/mp4");
+        results.push({ url, key });
+      }
+    } catch {
+      return NextResponse.json(
+        { error: `Falha ao enviar "${file.name}". Tente novamente.` },
+        { status: 502 }
+      );
     }
   }
 

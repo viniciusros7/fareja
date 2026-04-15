@@ -3,24 +3,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { PawPrint, Mail, ArrowRight, Heart, Search, Dog, CheckCircle2 } from "lucide-react";
+import { PawPrint, Mail, ArrowRight, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-type Mode = "choose" | "email" | "email_sent" | "pet_status";
-type PetStatus = "pet_parent" | "looking_first" | null;
+type Mode = "choose" | "email" | "email_sent";
 
 export default function LoginPage() {
   const [mode, setMode] = useState<Mode>("choose");
   const [email, setEmail] = useState("");
-  const [petStatus, setPetStatus] = useState<PetStatus>(null);
   const [loadingProvider, setLoadingProvider] = useState<"google" | "apple" | "azure" | "email" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
-  const callbackUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`;
-
   async function handleOAuth(provider: "google" | "apple" | "azure") {
+    const callbackUrl = `${window.location.origin}/auth/callback`;
     setLoadingProvider(provider);
     setError(null);
     const { error } = await supabase.auth.signInWithOAuth({
@@ -36,6 +33,7 @@ export default function LoginPage() {
   async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
+    const callbackUrl = `${window.location.origin}/auth/callback`;
     setLoadingProvider("email");
     setError(null);
     const { error } = await supabase.auth.signInWithOtp({
@@ -51,18 +49,6 @@ export default function LoginPage() {
     setLoadingProvider(null);
   }
 
-  async function handlePetStatus() {
-    if (!petStatus) return;
-    setLoadingProvider("email");
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      await supabase.from("profiles").update({ pet_status: petStatus }).eq("id", user.id);
-    }
-    router.push("/");
-    router.refresh();
-    setLoadingProvider(null);
-  }
-
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
@@ -74,13 +60,11 @@ export default function LoginPage() {
             </div>
           </Link>
           <h1 className="font-display text-2xl font-semibold text-brand-900 mb-1">
-            {mode === "pet_status" ? "Conte-nos sobre você" : "Entre na Fareja"}
+            Entre na Fareja
           </h1>
           <p className="text-sm text-earth-500">
             {mode === "email_sent"
               ? `Link enviado para ${email}`
-              : mode === "pet_status"
-              ? "Isso nos ajuda a personalizar sua experiência."
               : "Encontre canis verificados e conecte-se com a comunidade."}
           </p>
         </div>
@@ -107,73 +91,6 @@ export default function LoginPage() {
               className="text-xs text-brand-600 hover:text-brand-700 font-medium"
             >
               Usar outro email
-            </button>
-          </div>
-        )}
-
-        {/* ── Pet Status ── */}
-        {mode === "pet_status" && (
-          <div className="space-y-3">
-            <button
-              onClick={() => setPetStatus("pet_parent")}
-              className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
-                petStatus === "pet_parent" ? "border-brand-500 bg-brand-50" : "border-earth-200 bg-white hover:border-earth-300"
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  petStatus === "pet_parent" ? "bg-brand-100 text-brand-600" : "bg-earth-100 text-earth-500"
-                }`}>
-                  <Heart className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold text-earth-800">Pai/Mãe de pet</div>
-                  <p className="text-xs text-earth-500 mt-0.5 leading-relaxed">
-                    Já tenho um ou mais cães e quero conectar com a comunidade.
-                  </p>
-                </div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => setPetStatus("looking_first")}
-              className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
-                petStatus === "looking_first" ? "border-brand-500 bg-brand-50" : "border-earth-200 bg-white hover:border-earth-300"
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  petStatus === "looking_first" ? "bg-brand-100 text-brand-600" : "bg-earth-100 text-earth-500"
-                }`}>
-                  <Search className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold text-earth-800">Procurando meu primeiro pet</div>
-                  <p className="text-xs text-earth-500 mt-0.5 leading-relaxed">
-                    Ainda não tenho um cão e quero encontrar um canil de confiança.
-                  </p>
-                </div>
-              </div>
-            </button>
-
-            {petStatus === "looking_first" && (
-              <div className="p-3 rounded-lg bg-forest-50 border border-forest-200">
-                <p className="text-xs text-forest-700 flex items-start gap-2">
-                  <Dog className="w-4 h-4 shrink-0 mt-0.5" />
-                  <span>Vamos te ajudar com nosso <strong>guia de raças</strong> para encontrar o companheiro ideal.</span>
-                </p>
-              </div>
-            )}
-
-            <button
-              onClick={handlePetStatus}
-              disabled={!petStatus || loadingProvider !== null}
-              className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
-                petStatus && loadingProvider === null ? "bg-brand-600 text-white hover:bg-brand-700" : "bg-earth-200 text-earth-400 cursor-not-allowed"
-              }`}
-            >
-              {loadingProvider !== null ? "Salvando..." : "Continuar"}
-              {loadingProvider === null && <ArrowRight className="w-4 h-4" />}
             </button>
           </div>
         )}
@@ -276,7 +193,7 @@ export default function LoginPage() {
           </form>
         )}
 
-        {mode !== "email_sent" && mode !== "pet_status" && (
+        {mode !== "email_sent" && (
           <p className="text-center text-xs text-earth-400 mt-6 leading-relaxed">
             Ao continuar, você concorda com os{" "}
             <Link href="/termos" className="text-brand-600 hover:underline">Termos de Uso</Link>{" "}

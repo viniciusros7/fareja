@@ -83,13 +83,20 @@ export async function POST(request: NextRequest) {
       const since = new Date();
       since.setHours(0, 0, 0, 0);
 
-      const { count } = await supabase
+      const { count, error: countError } = await supabase
         .from("posts")
         .select("id", { count: "exact", head: true })
         .eq("author_id", user.id)
         .gte("created_at", since.toISOString());
 
-      if ((count ?? 0) >= limit) {
+      if (countError || count === null) {
+        return NextResponse.json(
+          { error: "Não foi possível verificar o limite diário. Tente novamente." },
+          { status: 503 }
+        );
+      }
+
+      if (count >= limit) {
         return NextResponse.json(
           { error: `Limite de ${limit} posts por dia atingido para o plano ${plan}.` },
           { status: 429 }

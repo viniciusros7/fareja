@@ -99,10 +99,10 @@ export default function Header() {
   const { user, signOut, loading } = useUser();
   const { role } = useRole();
 
-  // Clientes logados não veem "Para criadores"
+  // Apenas kennel/approver/super_admin veem "Para criadores"
   const navLinks = allNavLinks.filter((link) => {
     if (link.href === "/para-criadores") {
-      return !user || role !== "client";
+      return !!user && role !== "client";
     }
     return true;
   });

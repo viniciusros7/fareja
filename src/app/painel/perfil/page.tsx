@@ -450,7 +450,7 @@ export default function PerfilPage() {
                     <span className="font-bold text-earth-900">{favoritesReceived}</span> favoritos recebidos
                   </span>
                   <Link
-                    href={`/canils/${kennel.slug}`}
+                    href={`/canis/${kennel.id}`}
                     className="text-brand-600 hover:text-brand-700 font-medium text-xs flex items-center gap-1"
                   >
                     Ver página pública <ExternalLink className="w-3 h-3" />

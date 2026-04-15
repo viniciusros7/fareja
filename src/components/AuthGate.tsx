@@ -79,7 +79,7 @@ export default function AuthGate({
           Esta área é exclusiva para criadores verificados do Fareja.
         </p>
         <Link
-          href="/para-criadores"
+          href="/para-criadores/cadastro"
           className="px-6 py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors"
         >
           Quero cadastrar meu canil

@@ -15,7 +15,7 @@ const kennelNavItems = [
   { href: "/painel/filhotes", label: "Filhotes", icon: Dog },
   { href: "/painel/reprodutores", label: "Reprodutores", icon: PawPrint },
   { href: "/painel/avaliacoes", label: "Avaliações", icon: Star },
-  { href: "/painel/comunidade", label: "Comunidade", icon: MessageCircle },
+  { href: "/comunidade", label: "Comunidade", icon: MessageCircle },
   { href: "/painel/parceiros", label: "Parceiros", icon: Stethoscope },
   { href: "/painel/configuracoes", label: "Configurações", icon: Settings },
 ];

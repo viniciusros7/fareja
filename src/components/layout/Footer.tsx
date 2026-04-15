@@ -45,8 +45,8 @@ export default function Footer() {
             <ul className="space-y-2">
               {[
                 ["#", "Central de ajuda"],
-                ["#", "Termos de uso"],
-                ["#", "Política de privacidade"],
+                ["/termos", "Termos de uso"],
+                ["/privacidade", "Política de privacidade"],
               ].map(([href, label]) => (
                 <li key={label}>
                   <Link href={href} className="text-sm text-earth-500 hover:text-brand-600 transition-colors">

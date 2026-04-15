@@ -4,10 +4,9 @@ import Link from "next/link";
 import {
   CheckCircle2, Star, ArrowRight, ShieldCheck, TrendingUp,
   Users, PenLine, Sparkles, PawPrint, Zap, Crown,
-  Stethoscope, Store, MessageCircle, Camera, Gem, Lock, Loader2,
+  Stethoscope, Store, MessageCircle, Camera, Gem,
 } from "lucide-react";
-import { useUser } from "@/lib/hooks/useUser";
-import { useRole } from "@/lib/hooks/useRole";
+import AuthGate from "@/components/AuthGate";
 
 const plans = [
   {
@@ -108,40 +107,7 @@ const steps = [
   { num: "4", title: "Canil aprovado", desc: "Perfil visível para todos os compradores da plataforma." },
 ];
 
-export default function ParaCriadoresPage() {
-  const { user, loading: userLoading } = useUser();
-  const { role, loading: roleLoading } = useRole();
-
-  if (userLoading || roleLoading) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-earth-400" />
-      </div>
-    );
-  }
-
-  if (user && role === "client") {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 py-12 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-earth-100 flex items-center justify-center mb-4">
-          <Lock className="w-7 h-7 text-earth-400" />
-        </div>
-        <h2 className="font-display text-xl font-semibold text-earth-900 mb-2">
-          Esta área é exclusiva para criadores verificados do Fareja.
-        </h2>
-        <p className="text-sm text-earth-500 max-w-sm mx-auto mb-6 leading-relaxed">
-          Para cadastrar seu canil na plataforma, preencha o formulário de interesse e nossa equipe entrará em contato.
-        </p>
-        <Link
-          href="/para-criadores/cadastro"
-          className="px-6 py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors"
-        >
-          Quero cadastrar meu canil
-        </Link>
-      </div>
-    );
-  }
-
+function ParaCriadoresContent() {
   return (
     <div className="overflow-hidden">
       {/* Hero */}
@@ -228,7 +194,7 @@ export default function ParaCriadoresPage() {
                   </h3>
                   <p className="text-xs text-earth-500 mb-4">{plan.description}</p>
                   <div className="flex items-baseline gap-1 mb-5">
-                    <span className={`font-display text-3xl font-semibold ${isSuperPremium ? "text-brand-600" : "text-brand-600"}`}>
+                    <span className="font-display text-3xl font-semibold text-brand-600">
                       {plan.price}
                     </span>
                     <span className="text-sm text-earth-400">{plan.period}</span>
@@ -329,5 +295,13 @@ export default function ParaCriadoresPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function ParaCriadoresPage() {
+  return (
+    <AuthGate requiredRoles={["kennel", "super_admin", "approver"]}>
+      <ParaCriadoresContent />
+    </AuthGate>
   );
 }
