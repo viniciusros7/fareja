@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Loader2, PawPrint, ArrowRight, Star, MapPin } from "lucide-react";
+import { Loader2, PawPrint, ArrowRight, Star, MapPin, Home, MessageCircle } from "lucide-react";
 import PostCard, { type FeedPost } from "@/components/community/PostCard";
 import CreatePostButton from "@/components/community/CreatePostButton";
 import { useUser } from "@/lib/hooks/useUser";
@@ -63,8 +63,9 @@ function DesktopSidebar() {
         <h3 className="text-sm font-semibold text-earth-700 mb-3">Explorar</h3>
         <div className="space-y-2">
           {[
+            { href: "/", label: "Início", icon: Home },
             { href: "/buscar", label: "Buscar canis", icon: Star },
-            { href: "/comunidade/forum", label: "Fórum da comunidade", icon: MapPin },
+            { href: "/comunidade/forum", label: "Fórum da comunidade", icon: MessageCircle },
             { href: "/racas", label: "Guia de raças", icon: PawPrint },
             { href: "/encontrar-raca", label: "Qual raça combina?", icon: PawPrint },
           ].map((item) => (

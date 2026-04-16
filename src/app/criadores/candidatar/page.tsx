@@ -215,6 +215,11 @@ export default function CandidatarPage() {
               <p className="text-sm text-earth-500 mt-1">Informações de contato do responsável pelo canil.</p>
             </div>
 
+            <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-brand-50 border border-brand-100 text-xs text-brand-700 leading-relaxed">
+              <span className="shrink-0 mt-0.5">💡</span>
+              Ao final do questionário, você receberá uma sugestão de plano com os valores disponíveis.
+            </div>
+
             <div>
               <label className="block text-xs font-medium text-earth-600 mb-1.5">Nome completo *</label>
               <input

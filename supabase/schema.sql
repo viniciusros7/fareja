@@ -267,6 +267,7 @@ create policy "Remove favorito" on public.favorites for delete using (auth.uid()
 -- ============================================================
 
 -- Criar perfil automaticamente quando usuário se registra
+-- e inserir notificação de boas-vindas
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
@@ -277,6 +278,15 @@ begin
     coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', ''),
     coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', null)
   );
+
+  insert into public.notifications (user_id, type, content, link)
+  values (
+    new.id,
+    'welcome',
+    'Bem-vindo ao Fareja! 🐾 Explore os canis verificados e participe da comunidade.',
+    '/buscar'
+  );
+
   return new;
 end;
 $$ language plpgsql security definer;
@@ -736,3 +746,40 @@ create policy "admin_all" on public.kennel_applications
 
 create index kennel_applications_status on public.kennel_applications(status, created_at desc);
 create index kennel_applications_user   on public.kennel_applications(user_id);
+
+-- ============================================================
+-- FASE 14B — MIGRAÇÃO: tipo 'welcome' nas notificações
+-- Execute este bloco no SQL Editor se o banco já existe
+-- ============================================================
+
+-- 1. Atualiza o CHECK constraint para incluir 'welcome'
+alter table public.notifications
+  drop constraint if exists notifications_type_check;
+
+alter table public.notifications
+  add constraint notifications_type_check
+    check (type in ('comment_reply', 'new_post', 'kennel_update', 'admin_alert', 'welcome'));
+
+-- 2. Atualiza a função handle_new_user para inserir notificação de boas-vindas
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, email, full_name, avatar_url)
+  values (
+    new.id,
+    new.email,
+    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', ''),
+    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', null)
+  );
+
+  insert into public.notifications (user_id, type, content, link)
+  values (
+    new.id,
+    'welcome',
+    'Bem-vindo ao Fareja! 🐾 Explore os canis verificados e participe da comunidade.',
+    '/buscar'
+  );
+
+  return new;
+end;
+$$ language plpgsql security definer;

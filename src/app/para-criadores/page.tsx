@@ -13,8 +13,6 @@ const plans = [
   {
     id: "basic",
     name: "Canil Verificado",
-    price: "R$ 150",
-    period: "/mês",
     description: "Presença completa na plataforma com selo de verificação.",
     tier: "basic" as const,
     features: [
@@ -31,8 +29,6 @@ const plans = [
   {
     id: "premium",
     name: "Canil Premium",
-    price: "R$ 250",
-    period: "/mês",
     description: "Mais visibilidade e ferramentas para crescer.",
     tier: "premium" as const,
     features: [
@@ -49,8 +45,6 @@ const plans = [
   {
     id: "super_premium",
     name: "Canil Elite",
-    price: "R$ 350",
-    period: "/mês",
     description: "O máximo em visibilidade, parcerias e engajamento.",
     tier: "super_premium" as const,
     features: [
@@ -167,7 +161,7 @@ function ParaCriadoresContent() {
               Planos
             </h2>
             <p className="text-sm text-earth-500">
-              Investimento mensal com cancelamento a qualquer momento.
+              Complete o questionário de candidatura para receber seu plano sugerido e conhecer os valores.
             </p>
           </div>
 
@@ -209,12 +203,6 @@ function ParaCriadoresContent() {
                     {plan.name}
                   </h3>
                   <p className="text-xs text-earth-500 mb-4">{plan.description}</p>
-                  <div className="flex items-baseline gap-1 mb-5">
-                    <span className="font-display text-3xl font-semibold text-brand-600">
-                      {plan.price}
-                    </span>
-                    <span className="text-sm text-earth-400">{plan.period}</span>
-                  </div>
 
                   <ul className="space-y-2.5 mb-6">
                     {plan.features.map((f) => (
