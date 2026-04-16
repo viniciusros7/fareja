@@ -33,7 +33,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
           strokeWidth={active ? 2.5 : 1.75}
         />
         {item.badge != null && item.badge > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] px-0.5 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none">
+          <span className="badge-pulse absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] px-0.5 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none">
             {item.badge > 9 ? "9+" : item.badge}
           </span>
         )}
@@ -90,7 +90,7 @@ export default function BottomNav() {
             className={`w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all active:scale-95 ${
               isFeedActive
                 ? "bg-brand-700 shadow-lg shadow-brand-700/30"
-                : "bg-brand-600 shadow-lg shadow-brand-600/30"
+                : "bg-brand-600 shadow-lg shadow-brand-600/30 feed-glow"
             }`}
             style={{ marginTop: "-18px" }}
           >

@@ -73,7 +73,7 @@ export default function HomePage() {
   return (
     <div className="overflow-hidden">
       {/* ── Hero ── */}
-      <section className="relative">
+      <section className="relative hero-paws">
         <div className="absolute inset-0 bg-gradient-to-b from-brand-100/60 via-brand-50/30 to-transparent pointer-events-none" />
         <div className="relative max-w-4xl mx-auto px-4 pt-16 pb-20 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-100 text-brand-600 rounded-full text-xs font-semibold mb-6 animate-fade-in-up">
