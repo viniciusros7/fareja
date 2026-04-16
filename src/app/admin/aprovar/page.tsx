@@ -3,15 +3,15 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  ShieldCheck, CheckCircle2, XCircle, Clock, Eye,
-  ChevronDown, ChevronUp, MapPin, Phone, Mail,
-  Gem, Sparkles, AlertTriangle, Search,
-  DollarSign, Users, Settings, MessageCircle, Loader2,
+  ShieldCheck, CheckCircle2, XCircle, Clock,
+  ChevronDown, ChevronUp, Phone, Mail,
+  Gem, Sparkles, AlertTriangle, Search, Loader2,
 } from "lucide-react";
 import { useRole } from "@/lib/hooks/useRole";
 import { useUser } from "@/lib/hooks/useUser";
 import AccessDenied from "@/components/layout/AccessDenied";
 import { createClient } from "@/lib/supabase/client";
+import { AdminNav } from "@/components/admin/AdminNav";
 
 async function adminFetch(url: string, body: Record<string, unknown>): Promise<{ error?: string }> {
   const res = await fetch(url, {
@@ -62,40 +62,6 @@ const planLabel: Record<string, { label: string; cls: string }> = {
   super_premium: { label: "Elite", cls: "bg-gradient-to-r from-brand-600 to-brand-500 text-white" },
 };
 
-function AdminNav({ active }: { active: string }) {
-  const { role } = useRole();
-
-  const superAdminTabs = [
-    { key: "aprovar", label: "Aprovar canis", href: "/admin/aprovar", icon: ShieldCheck },
-    { key: "financeiro", label: "Financeiro", href: "/admin/financeiro", icon: DollarSign },
-    { key: "usuarios", label: "Usuários", href: "/admin/usuarios", icon: Users },
-    { key: "configuracoes", label: "Configurações", href: "/admin/configuracoes", icon: Settings },
-  ];
-
-  const approverTabs = [
-    { key: "aprovar", label: "Aprovar canis", href: "/admin/aprovar", icon: ShieldCheck },
-    { key: "mensagens", label: "Mensagens", href: "/admin/mensagens", icon: MessageCircle },
-  ];
-
-  const tabs = role === "super_admin" ? superAdminTabs : approverTabs;
-
-  return (
-    <div className="flex gap-1 p-1 bg-earth-100 rounded-lg mb-6 overflow-x-auto">
-      {tabs.map(({ key, label, href, icon: Icon }) => (
-        <Link
-          key={key}
-          href={href}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
-            active === key ? "bg-white text-earth-900 shadow-sm" : "text-earth-500 hover:text-earth-700"
-          }`}
-        >
-          <Icon className="w-4 h-4" />
-          {label}
-        </Link>
-      ))}
-    </div>
-  );
-}
 
 export default function AdminAprovarPage() {
   const { user, loading: userLoading } = useUser();

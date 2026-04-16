@@ -2,22 +2,24 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, Search, User, PawPrint, LogOut, ChevronDown } from "lucide-react";
+import { Menu, X, Search, User, PawPrint, LogOut, ChevronDown, Layers, Bell } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
 import { useRole } from "@/lib/hooks/useRole";
+import { useNotificationCount } from "@/lib/hooks/useNotificationCount";
 
 const allNavLinks = [
   { href: "/canis", label: "Canis" },
+  { href: "/comunidade/feed", label: "Feed", highlight: true },
   { href: "/racas", label: "Raças" },
   { href: "/encontrar-raca", label: "Qual raça?" },
-  { href: "/doacoes", label: "Doações" },
-  { href: "/comunidade", label: "Comunidade" },
+  { href: "/comunidade/forum", label: "Fórum" },
   { href: "/para-criadores", label: "Para criadores" },
 ];
 
 function UserMenu() {
   const { user, signOut, loading } = useUser();
   const [open, setOpen] = useState(false);
+  const unread = useNotificationCount();
 
   if (loading) {
     return <div className="w-20 h-8 rounded-full bg-earth-100 animate-pulse" />;
@@ -50,8 +52,13 @@ function UserMenu() {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-earth-200 hover:bg-earth-50 transition-colors"
+        className="relative flex items-center gap-2 px-3 py-1.5 rounded-full border border-earth-200 hover:bg-earth-50 transition-colors"
       >
+        {unread > 0 && (
+          <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-0.5 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center z-10">
+            {unread > 9 ? "9+" : unread}
+          </span>
+        )}
         {avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={avatarUrl} alt={displayName} className="w-6 h-6 rounded-full object-cover" />
@@ -131,8 +138,15 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="px-4 py-2 text-sm font-medium text-earth-600 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+              className={
+                (link as { highlight?: boolean }).highlight
+                  ? "flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-full transition-colors"
+                  : "px-4 py-2 text-sm font-medium text-earth-600 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+              }
             >
+              {(link as { highlight?: boolean }).highlight && (
+                <Layers className="w-3.5 h-3.5" strokeWidth={2} />
+              )}
               {link.label}
             </Link>
           ))}

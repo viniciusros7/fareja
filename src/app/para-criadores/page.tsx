@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import {
-  CheckCircle2, Star, ArrowRight, ShieldCheck, TrendingUp,
+  CheckCircle2, ArrowRight, ShieldCheck, TrendingUp,
   Users, PenLine, Sparkles, PawPrint, Zap, Crown,
   Stethoscope, Store, MessageCircle, Camera, Gem,
 } from "lucide-react";
-import AuthGate from "@/components/AuthGate";
+import { useUser } from "@/lib/hooks/useUser";
+import { useRole } from "@/lib/hooks/useRole";
 
 const plans = [
   {
@@ -108,6 +109,21 @@ const steps = [
 ];
 
 function ParaCriadoresContent() {
+  const { user } = useUser();
+  const { isKennel, loading: roleLoading } = useRole();
+
+  const ctaHref = !user
+    ? "/login"
+    : isKennel
+    ? "/painel"
+    : "/criadores/candidatar";
+
+  const ctaLabel = !user
+    ? "Entrar para candidatar"
+    : isKennel
+    ? "Acessar meu painel"
+    : "Candidatar meu canil";
+
   return (
     <div className="overflow-hidden">
       {/* Hero */}
@@ -211,7 +227,8 @@ function ParaCriadoresContent() {
                     ))}
                   </ul>
 
-                  <button
+                  <Link
+                    href={roleLoading ? "#" : ctaHref}
                     className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-colors ${
                       isSuperPremium
                         ? "bg-gradient-to-r from-brand-600 to-brand-500 text-white hover:from-brand-700 hover:to-brand-600 shadow-md"
@@ -220,9 +237,9 @@ function ParaCriadoresContent() {
                         : "bg-brand-100 text-brand-600 hover:bg-brand-200"
                     }`}
                   >
-                    Começar agora
+                    {ctaLabel}
                     <ArrowRight className="w-4 h-4" />
-                  </button>
+                  </Link>
                 </div>
               );
             })}
@@ -286,11 +303,11 @@ function ParaCriadoresContent() {
             criadores verificados.
           </p>
           <Link
-            href="/para-criadores/cadastro"
+            href={roleLoading ? "#" : ctaHref}
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors"
           >
             <Zap className="w-4 h-4" />
-            Cadastrar meu canil
+            {ctaLabel}
           </Link>
         </div>
       </section>
@@ -299,9 +316,5 @@ function ParaCriadoresContent() {
 }
 
 export default function ParaCriadoresPage() {
-  return (
-    <AuthGate requiredRoles={["kennel", "super_admin", "approver"]}>
-      <ParaCriadoresContent />
-    </AuthGate>
-  );
+  return <ParaCriadoresContent />;
 }

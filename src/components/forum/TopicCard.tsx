@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Pin, CheckCircle2, MessageSquare, Heart, Eye, Gem, Star, CheckCircle } from "lucide-react";
+import { Pin, CheckCircle2, MessageSquare, Heart, Eye, Gem, Star, CheckCircle, Award } from "lucide-react";
 import type { ForumTopic } from "@/lib/types/forum";
 
 function timeAgo(date: string): string {
@@ -33,31 +33,33 @@ export default function TopicCard({ topic }: TopicCardProps) {
   return (
     <Link
       href={`/comunidade/forum/${slug}/${topic.id}`}
-      className="block p-4 rounded-xl border border-earth-200 bg-white hover:border-brand-300 hover:shadow-sm transition-all group"
+      className="block bg-white rounded-2xl border border-earth-100 p-4 hover:border-brand-200 hover:shadow-[0_2px_12px_rgba(184,92,47,0.08)] transition-all group"
     >
-      {/* Badges row */}
-      <div className="flex items-center gap-1.5 mb-2 flex-wrap">
-        {topic.is_pinned && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-semibold">
-            <Pin className="w-2.5 h-2.5" />
-            Fixado
-          </span>
-        )}
-        {topic.is_solved && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-forest-50 text-forest-700 text-[10px] font-semibold">
-            <CheckCircle2 className="w-2.5 h-2.5" />
-            Resolvido
-          </span>
-        )}
-        {topic.status === "closed" && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-earth-100 text-earth-500 text-[10px] font-semibold">
-            Fechado
-          </span>
-        )}
-      </div>
+      {/* Status badges */}
+      {(topic.is_pinned || topic.is_solved || topic.status === "closed") && (
+        <div className="flex items-center gap-1.5 mb-2.5 flex-wrap">
+          {topic.is_pinned && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-semibold border border-amber-100">
+              <Pin className="w-2.5 h-2.5" />
+              Fixado
+            </span>
+          )}
+          {topic.is_solved && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-forest-50 text-forest-600 text-[10px] font-semibold border border-forest-100">
+              <Award className="w-2.5 h-2.5" />
+              Resolvido
+            </span>
+          )}
+          {topic.status === "closed" && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-earth-100 text-earth-500 text-[10px] font-semibold">
+              Fechado
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Title */}
-      <h3 className="text-sm font-semibold text-earth-900 group-hover:text-brand-600 transition-colors leading-snug mb-2 line-clamp-2">
+      <h3 className="text-sm font-semibold text-earth-900 group-hover:text-brand-700 transition-colors leading-snug mb-1.5 line-clamp-2">
         {topic.title}
       </h3>
 
@@ -67,7 +69,8 @@ export default function TopicCard({ topic }: TopicCardProps) {
       </p>
 
       {/* Footer */}
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center gap-3 flex-wrap pt-3 border-t border-earth-50">
+        {/* Author */}
         <div className="flex items-center gap-1.5 flex-1 min-w-0">
           <div className="w-5 h-5 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-[9px] font-semibold shrink-0">
             {displayName.slice(0, 2).toUpperCase()}
@@ -81,20 +84,21 @@ export default function TopicCard({ topic }: TopicCardProps) {
           )}
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <span className="flex items-center gap-1 text-[11px] text-earth-400">
+        {/* Stats */}
+        <div className="flex items-center gap-3 shrink-0 text-[11px] text-earth-400">
+          <span className="flex items-center gap-1">
             <MessageSquare className="w-3.5 h-3.5" />
             {topic.replies_count}
           </span>
-          <span className="flex items-center gap-1 text-[11px] text-earth-400">
+          <span className="flex items-center gap-1">
             <Heart className="w-3.5 h-3.5" />
             {topic.likes_count}
           </span>
-          <span className="flex items-center gap-1 text-[11px] text-earth-400">
+          <span className="flex items-center gap-1">
             <Eye className="w-3.5 h-3.5" />
             {topic.views_count}
           </span>
-          <span className="text-[11px] text-earth-400">{timeAgo(topic.updated_at)}</span>
+          <span className="text-earth-300">{timeAgo(topic.updated_at)}</span>
         </div>
       </div>
     </Link>
