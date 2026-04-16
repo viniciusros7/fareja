@@ -3,8 +3,9 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { PawPrint, Mail, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { PawPrint, Mail, ArrowRight, CheckCircle2, Loader2, Lock } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import PioneerBanner from "@/components/landing/PioneerBanner";
 
 type Mode = "choose" | "email" | "email_sent";
 
@@ -65,6 +66,11 @@ function LoginForm() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
+        {/* Pioneer banner */}
+        <div className="mb-6">
+          <PioneerBanner />
+        </div>
+
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
@@ -195,12 +201,32 @@ function LoginForm() {
         )}
 
         {mode !== "email_sent" && (
-          <p className="text-center text-xs text-earth-400 mt-6 leading-relaxed">
-            Ao continuar, você concorda com os{" "}
-            <Link href="/termos" className="text-brand-600 hover:underline">Termos de Uso</Link>{" "}
-            e a{" "}
-            <Link href="/privacidade" className="text-brand-600 hover:underline">Política de Privacidade</Link>.
-          </p>
+          <>
+            <p className="text-center text-xs text-earth-400 mt-6 leading-relaxed">
+              Ao continuar, você concorda com os{" "}
+              <Link href="/termos" className="text-brand-600 hover:underline">Termos de Uso</Link>{" "}
+              e a{" "}
+              <Link href="/privacidade" className="text-brand-600 hover:underline">Política de Privacidade</Link>.
+            </p>
+
+            {/* Privacy trust section */}
+            <div className="mt-6 p-4 rounded-xl bg-earth-50 border border-earth-100 text-xs text-earth-500 leading-relaxed space-y-2">
+              <p className="flex items-start gap-1.5">
+                <Lock className="w-3.5 h-3.5 shrink-0 mt-0.5 text-earth-400" />
+                <span>
+                  <strong className="text-earth-700">Sua privacidade é prioridade.</strong>{" "}
+                  Utilizamos apenas seu email para controles internos do site. Não compartilhamos
+                  suas informações com nenhum canal externo e não utilizamos cookies para marketing.
+                  Nossos colaboradores mantêm o Fareja funcionando sem essa necessidade.
+                </span>
+              </p>
+              <p>
+                <Link href="/privacidade" className="text-brand-600 hover:underline font-medium">
+                  📄 Leia nossa Política de Privacidade completa
+                </Link>
+              </p>
+            </div>
+          </>
         )}
       </div>
     </div>

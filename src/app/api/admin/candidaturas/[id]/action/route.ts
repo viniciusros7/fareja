@@ -52,12 +52,31 @@ export async function POST(
 
     if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
 
+    // Check if this kennel qualifies for the Founders Program (first 10)
+    const { count: founderCount } = await supabase
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("is_founder", true);
+
+    const isNewFounder = (founderCount ?? 0) < 10;
+    const founderNumber = isNewFounder ? (founderCount ?? 0) + 1 : null;
+    const founderFreeUntil = isNewFounder
+      ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+      : null;
+
     await supabase
       .from("profiles")
-      .update({ role: "kennel" })
+      .update({
+        role: "kennel",
+        ...(isNewFounder && {
+          is_founder: true,
+          founder_number: founderNumber,
+          founder_free_until: founderFreeUntil,
+        }),
+      })
       .eq("id", app.user_id);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, is_founder: isNewFounder, founder_number: founderNumber });
   }
 
   const { error: updateError } = await supabase

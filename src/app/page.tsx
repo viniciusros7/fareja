@@ -16,6 +16,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import StatsCounter from "@/components/landing/StatsCounter";
+import PioneerBanner from "@/components/landing/PioneerBanner";
 
 const features = [
   {
@@ -114,6 +115,11 @@ export default function HomePage() {
           {/* Animated stats */}
           <StatsCounter />
         </div>
+      </section>
+
+      {/* ── Pioneer Banner ── */}
+      <section className="max-w-2xl mx-auto px-4 pb-8">
+        <PioneerBanner />
       </section>
 
       {/* ── Features ── */}

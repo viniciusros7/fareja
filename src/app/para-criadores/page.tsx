@@ -1,10 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   CheckCircle2, ArrowRight, ShieldCheck, TrendingUp,
   Users, PenLine, Sparkles, PawPrint, Zap, Crown,
-  Stethoscope, Store, MessageCircle, Camera, Gem,
+  Stethoscope, Store, MessageCircle, Camera, Gem, Trophy,
 } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
 import { useRole } from "@/lib/hooks/useRole";
@@ -104,7 +105,16 @@ const steps = [
 
 function ParaCriadoresContent() {
   const { user } = useUser();
-  const { isKennel, loading: roleLoading } = useRole();
+  const { isKennel, isApprover, isAdmin, loading: roleLoading } = useRole();
+  const [founderCount, setFounderCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/stats/growth")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d) setFounderCount(d.founders); });
+  }, []);
+
+  const showFounderBanner = !!user && (isKennel || isApprover || isAdmin);
 
   const ctaHref = !user
     ? "/login"
@@ -137,6 +147,74 @@ function ParaCriadoresContent() {
           </p>
         </div>
       </section>
+
+      {/* Founder Program Banner — only for kennel/admin */}
+      {showFounderBanner && (
+        <section className="max-w-3xl mx-auto px-4 pb-8">
+          <div className="relative overflow-hidden rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-amber-100/60 p-6">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/30 rounded-full -translate-y-8 translate-x-8 pointer-events-none" />
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+                  <Trophy className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display text-lg font-semibold text-amber-900 leading-tight">
+                    Programa Canis Fundadores
+                  </h2>
+                </div>
+              </div>
+
+              <ul className="space-y-1.5 mb-5 text-sm text-amber-800 leading-relaxed">
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-500 shrink-0 mt-0.5">•</span>
+                  Isenção total de pagamento por <strong>1 ano</strong>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-500 shrink-0 mt-0.5">•</span>
+                  Após o primeiro ano, <strong>preço exclusivo permanente de fundador</strong>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-500 shrink-0 mt-0.5">•</span>
+                  Badge <strong>Canil Fundador 🏆</strong> no perfil e nos resultados de busca
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-500 shrink-0 mt-0.5">•</span>
+                  Prioridade em novos recursos e funcionalidades
+                </li>
+              </ul>
+
+              {/* Counter */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 max-w-xs">
+                  <div className="flex items-center justify-between text-[11px] font-medium mb-1.5 text-amber-700">
+                    <span>Vagas de fundador preenchidas</span>
+                    {founderCount !== null && (
+                      <span className="font-semibold">{founderCount} / 10</span>
+                    )}
+                  </div>
+                  <div className="h-1.5 bg-amber-200 rounded-full overflow-hidden">
+                    {founderCount !== null && (
+                      <div
+                        className="h-full bg-amber-500 rounded-full transition-all duration-700"
+                        style={{ width: `${Math.min(100, founderCount * 10)}%` }}
+                      />
+                    )}
+                  </div>
+                </div>
+                {founderCount !== null && founderCount < 10 && (
+                  <span className="text-xs text-amber-600 shrink-0 font-medium">
+                    {10 - founderCount} {10 - founderCount === 1 ? "vaga restante" : "vagas restantes"}
+                  </span>
+                )}
+                {founderCount !== null && founderCount >= 10 && (
+                  <span className="text-xs font-semibold text-amber-700 shrink-0">Esgotado</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Benefits */}
       <section className="max-w-4xl mx-auto px-4 pb-16">

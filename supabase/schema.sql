@@ -266,17 +266,25 @@ create policy "Remove favorito" on public.favorites for delete using (auth.uid()
 -- FUNÇÕES
 -- ============================================================
 
--- Criar perfil automaticamente quando usuário se registra
--- e inserir notificação de boas-vindas
+-- Criar perfil automaticamente quando usuário se registra,
+-- marcar pioneiro (primeiros 100 clientes) e inserir notificação de boas-vindas
 create or replace function public.handle_new_user()
 returns trigger as $$
+declare
+  client_count integer;
 begin
-  insert into public.profiles (id, email, full_name, avatar_url)
+  -- Conta clientes existentes (antes deste novo usuário)
+  select count(*) into client_count
+  from public.profiles
+  where role = 'client';
+
+  insert into public.profiles (id, email, full_name, avatar_url, is_pioneer)
   values (
     new.id,
     new.email,
     coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', ''),
-    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', null)
+    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', null),
+    client_count < 100  -- primeiros 100 são pioneiros
   );
 
   insert into public.notifications (user_id, type, content, link)
@@ -666,7 +674,11 @@ create trigger trg_forum_replies_count
 alter table public.profiles
   add column if not exists bio text,
   add column if not exists privacy_accepted boolean not null default false,
-  add column if not exists privacy_accepted_at timestamptz;
+  add column if not exists privacy_accepted_at timestamptz,
+  add column if not exists is_pioneer boolean not null default false,
+  add column if not exists is_founder boolean not null default false,
+  add column if not exists founder_number integer,
+  add column if not exists founder_free_until timestamptz;
 
 create table public.notifications (
   id uuid primary key default gen_random_uuid(),
@@ -748,11 +760,18 @@ create index kennel_applications_status on public.kennel_applications(status, cr
 create index kennel_applications_user   on public.kennel_applications(user_id);
 
 -- ============================================================
--- FASE 14B — MIGRAÇÃO: tipo 'welcome' nas notificações
+-- FASE 14B + F15 — MIGRAÇÃO
 -- Execute este bloco no SQL Editor se o banco já existe
 -- ============================================================
 
--- 1. Atualiza o CHECK constraint para incluir 'welcome'
+-- 1. Novas colunas em profiles (is_pioneer, is_founder, founder_number, founder_free_until)
+alter table public.profiles
+  add column if not exists is_pioneer boolean not null default false,
+  add column if not exists is_founder boolean not null default false,
+  add column if not exists founder_number integer,
+  add column if not exists founder_free_until timestamptz;
+
+-- 2. Atualiza o CHECK constraint para incluir 'welcome'
 alter table public.notifications
   drop constraint if exists notifications_type_check;
 
@@ -760,16 +779,23 @@ alter table public.notifications
   add constraint notifications_type_check
     check (type in ('comment_reply', 'new_post', 'kennel_update', 'admin_alert', 'welcome'));
 
--- 2. Atualiza a função handle_new_user para inserir notificação de boas-vindas
+-- 3. Atualiza handle_new_user: pioneiro + notificação de boas-vindas
 create or replace function public.handle_new_user()
 returns trigger as $$
+declare
+  client_count integer;
 begin
-  insert into public.profiles (id, email, full_name, avatar_url)
+  select count(*) into client_count
+  from public.profiles
+  where role = 'client';
+
+  insert into public.profiles (id, email, full_name, avatar_url, is_pioneer)
   values (
     new.id,
     new.email,
     coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', ''),
-    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', null)
+    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', null),
+    client_count < 100
   );
 
   insert into public.notifications (user_id, type, content, link)
