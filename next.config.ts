@@ -22,6 +22,8 @@ const nextConfig: NextConfig = {
         hostname: "images.dog.ceo",
         pathname: "/**",
       },
+      { protocol: "https", hostname: "commons.wikimedia.org", pathname: "/**" },
+      { protocol: "https", hostname: "upload.wikimedia.org", pathname: "/**" },
       ...(r2Hostname
         ? [{ protocol: "https" as const, hostname: r2Hostname, pathname: "/**" }]
         : []),
