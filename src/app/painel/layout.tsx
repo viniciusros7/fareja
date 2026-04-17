@@ -103,6 +103,27 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
         </div>
       </div>
 
+      {/* Mobile nav — fora do flex row para não esticar pela altura do content */}
+      <div className="md:hidden overflow-x-auto pb-2 mb-4 flex gap-1.5">
+        {navItems.slice(0, 5).map((item) => {
+          const active = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
+                active
+                  ? "bg-brand-100 text-brand-600 border-brand-300"
+                  : "bg-white text-earth-500 border-earth-200"
+              }`}
+            >
+              <item.icon className="w-3 h-3" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </div>
+
       <div className="flex gap-6">
         {/* Sidebar */}
         <nav className="hidden md:block w-52 shrink-0">
@@ -128,27 +149,6 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
             })}
           </div>
         </nav>
-
-        {/* Mobile nav */}
-        <div className="md:hidden overflow-x-auto pb-2 mb-4 flex gap-1.5 w-full">
-          {navItems.slice(0, 5).map((item) => {
-            const active = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
-                  active
-                    ? "bg-brand-100 text-brand-600 border-brand-300"
-                    : "bg-white text-earth-500 border-earth-200"
-                }`}
-              >
-                <item.icon className="w-3 h-3" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">{children}</div>
