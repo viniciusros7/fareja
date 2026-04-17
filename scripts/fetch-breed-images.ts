@@ -44,6 +44,20 @@ const DOG_API_BASE   = "https://api.thedogapi.com/v1";
 // Raças reservadas para fornecimento manual pelo Canil Good Leisure
 const KENNEL_PROVIDED = new Set(["Golden Retriever", "Beagle"]);
 
+// Mapa de tradução pt→Dog API consultado ANTES do fuzzy match
+const BREED_NAME_MAP: Record<string, string> = {
+  "Chihuahua":               "Chihuahueño",
+  "Dachshund (Teckel)":      "Dachshund",
+  "Shar Pei":                "Chinese Shar-Pei",
+  "Jack Russell Terrier":    "Parson Russell Terrier",
+  "Poodle Standard":         "Standard Poodle",
+  "Collie (Rough)":          "Collie",
+  "Flat-Coated Retriever":   "Flat-Coated Retriever",
+  "Mastiff Inglês":          "Mastiff",
+  "Mastim Napolitano":       "Neapolitan Mastiff",
+  "Cão de Água Português":   "Portuguese Water Dog",
+};
+
 const missing = [
   ["NEXT_PUBLIC_SUPABASE_URL", SUPABASE_URL],
   ["SUPABASE_SERVICE_ROLE_KEY", SERVICE_KEY],
@@ -174,7 +188,23 @@ async function main() {
       continue;
     }
 
-    const apiBreed = matchBreed(breed.name_en, dogApiBreeds);
+    // Consulta mapa pt→en antes do fuzzy (tenta name_pt e name_en como chave)
+    const mappedName = BREED_NAME_MAP[breed.name_pt] ?? BREED_NAME_MAP[breed.name_en];
+    let apiBreed: { id: number; name: string } | null = null;
+
+    if (mappedName) {
+      const targetNorm = normalize(mappedName);
+      apiBreed = dogApiBreeds.find((b) => normalize(b.name) === targetNorm) ?? null;
+      if (apiBreed) {
+        console.log(`   ✓ ${breed.name_pt} → matched via pt_en_map (${mappedName})`);
+      } else {
+        console.warn(`   ⚠️  pt_en_map hit (${mappedName}) mas sem match exato — tentando fuzzy`);
+        apiBreed = matchBreed(breed.name_en, dogApiBreeds);
+      }
+    } else {
+      apiBreed = matchBreed(breed.name_en, dogApiBreeds);
+    }
+
     if (!apiBreed) {
       noMatch.push(`${breed.name_pt} (${breed.name_en})`);
       continue;
