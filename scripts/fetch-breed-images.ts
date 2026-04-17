@@ -19,7 +19,14 @@
 //   npx tsx scripts/fetch-breed-images.ts
 // ============================================================
 
-try { require("dotenv").config({ path: ".env.local" }); } catch {}
+import { readFileSync } from "node:fs";
+try {
+  const raw = readFileSync(".env.local", "utf8");
+  for (const line of raw.split(/\r?\n/)) {
+    const m = line.match(/^([^#=\s][^=]*)=(.*)$/);
+    if (m) process.env[m[1].trim()] ??= m[2].trim();
+  }
+} catch { /* .env.local não encontrado */ }
 
 import { createClient } from "@supabase/supabase-js";
 import { S3Client, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
