@@ -370,6 +370,7 @@ create table public.breeds (
   temperament_pt text,
   description_pt text,
   image_url text,
+  image_source text check (image_source in ('curated', 'kennel_provided', 'dog_api')),
   created_at timestamptz default now()
 );
 
