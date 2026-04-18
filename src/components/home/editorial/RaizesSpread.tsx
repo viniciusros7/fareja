@@ -154,7 +154,7 @@ export default function RaizesSpread() {
           <figure>
             <div className="relative w-full" style={{ aspectRatio: "4/5" }}>
               <Image
-                src="/canil-good-leisure/good-leisure-02-two-adults.jpeg"
+                src="/canil-good-leisure/good-leisure-02-two-adults.webp"
                 alt="Dois Golden Retrievers adultos no Canil Good Leisure"
                 fill
                 quality={85}
@@ -174,7 +174,7 @@ export default function RaizesSpread() {
             <figure>
               <div className="relative w-full" style={{ aspectRatio: "3/4" }}>
                 <Image
-                  src="/canil-good-leisure/good-leisure-03-running.jpeg"
+                  src="/canil-good-leisure/good-leisure-03-running.webp"
                   alt="Golden Retriever correndo no gramado"
                   fill
                   quality={85}
@@ -191,7 +191,7 @@ export default function RaizesSpread() {
             <figure>
               <div className="relative w-full" style={{ aspectRatio: "3/4" }}>
                 <Image
-                  src="/canil-good-leisure/good-leisure-04-ball.jpeg"
+                  src="/canil-good-leisure/good-leisure-04-ball.webp"
                   alt="Golden Retriever brincando com bola"
                   fill
                   quality={85}

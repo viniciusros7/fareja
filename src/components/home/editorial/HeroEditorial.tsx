@@ -113,7 +113,7 @@ export default function HeroEditorial() {
       >
         <div className="relative w-full" style={{ aspectRatio: "4/5" }}>
           <Image
-            src="/canil-good-leisure/good-leisure-01-puppy-close.jpeg"
+            src="/canil-good-leisure/good-leisure-01-puppy-close.webp"
             alt="Filhote de Golden Retriever olhando diretamente para a câmera, Canil Good Leisure, São Lourenço da Serra"
             fill
             priority
