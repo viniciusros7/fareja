@@ -13,8 +13,7 @@ export async function GET(
     .select(`
       id, topic_id, author_id, content, images,
       likes_count, is_best_answer, created_at,
-      author:profiles!author_id(id, full_name, avatar_url, role),
-      kennel:kennels(id, name, slug, plan)
+      author:profiles!author_id(id, full_name, avatar_url, role)
     `)
     .eq("topic_id", id)
     .order("is_best_answer", { ascending: false })
@@ -24,7 +23,20 @@ export async function GET(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ replies: data ?? [] });
+  const replies = data ?? [];
+  const authorIds = [...new Set(replies.map((r) => r.author_id).filter(Boolean))];
+  const kennelMap = new Map<string, { id: string; name: string; slug: string; plan: string }>();
+
+  if (authorIds.length > 0) {
+    const { data: kennels } = await supabase
+      .from("kennels")
+      .select("id, name, slug, plan, owner_id")
+      .in("owner_id", authorIds)
+      .eq("status", "approved");
+    for (const k of kennels ?? []) kennelMap.set(k.owner_id, { id: k.id, name: k.name, slug: k.slug, plan: k.plan });
+  }
+
+  return NextResponse.json({ replies: replies.map((r) => ({ ...r, kennel: kennelMap.get(r.author_id) ?? null })) });
 }
 
 export async function POST(
@@ -71,8 +83,7 @@ export async function POST(
     .select(`
       id, topic_id, author_id, content, images,
       likes_count, is_best_answer, created_at,
-      author:profiles!author_id(id, full_name, avatar_url, role),
-      kennel:kennels(id, name, slug, plan)
+      author:profiles!author_id(id, full_name, avatar_url, role)
     `)
     .single();
 
@@ -80,5 +91,12 @@ export async function POST(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ reply }, { status: 201 });
+  const { data: kennelRow } = await supabase
+    .from("kennels")
+    .select("id, name, slug, plan")
+    .eq("owner_id", user.id)
+    .eq("status", "approved")
+    .maybeSingle();
+
+  return NextResponse.json({ reply: { ...reply, kennel: kennelRow ?? null } }, { status: 201 });
 }
