@@ -1,6 +1,6 @@
 export default function TopbarEditorial() {
   return (
-    <div className="flex items-center justify-center gap-3 py-3 border-b border-[rgba(26,15,7,0.12)]">
+    <div className="flex items-center justify-center gap-3 py-4 border-b border-[rgba(26,15,7,0.12)]">
       <span
         className="block w-5 h-px opacity-60"
         style={{ background: "var(--color-ink-muted)" }}

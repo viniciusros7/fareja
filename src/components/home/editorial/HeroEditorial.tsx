@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function HeroEditorial() {
   return (
     <section
-      className="relative max-w-[1240px] mx-auto px-[clamp(1.25rem,4vw,2.5rem)] pt-10 pb-0 md:pt-16"
+      className="relative max-w-[1240px] mx-auto px-[clamp(1.25rem,4vw,2.5rem)] pt-12 pb-0 md:pt-20"
       aria-labelledby="hero-title"
     >
       {/* Edition tag */}
@@ -37,7 +37,7 @@ export default function HeroEditorial() {
         style={{
           fontFamily: "var(--font-display)",
           fontWeight: 380,
-          fontVariationSettings: "'opsz' 144, 'SOFT' 30",
+          fontVariationSettings: "'opsz' 144, 'SOFT' 30, 'wght' 380",
           fontSize: "clamp(3rem, 13.5vw, 7rem)",
           lineHeight: 0.92,
           letterSpacing: "-0.035em",
@@ -51,7 +51,7 @@ export default function HeroEditorial() {
           style={{
             fontStyle: "italic",
             color: "var(--color-terracotta-deep)",
-            fontVariationSettings: "'opsz' 144, 'SOFT' 100",
+            fontVariationSettings: "'opsz' 144, 'SOFT' 100, 'wght' 380",
             position: "relative",
             whiteSpace: "nowrap",
           }}
