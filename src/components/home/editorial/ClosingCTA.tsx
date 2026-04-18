@@ -98,7 +98,7 @@ export default function ClosingCTA() {
         <figure className="closing-photo-wrap">
           <div className="relative w-full" style={{ aspectRatio: "5/4" }}>
             <Image
-              src="/canil-good-leisure/good-leisure-03-running.jpeg"
+              src="/canil-good-leisure/good-leisure-03-running.webp"
               alt="Golden Retriever correndo em direção à câmera no gramado do canil"
               fill
               quality={85}
