@@ -1,9 +1,31 @@
 import type { Metadata } from "next";
+import { Fraunces, Instrument_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 import PrivacyModal from "@/components/PrivacyModal";
+
+const fraunces = Fraunces({
+  subsets: ["latin", "latin-ext"],
+  axes: ["SOFT", "opsz"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
+
+const instrumentSans = Instrument_Sans({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-instrument-sans",
+  display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  variable: "--font-instrument-serif",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://fareja.app.br"),
@@ -27,12 +49,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-      </head>
+    <html
+      lang="pt-BR"
+      className={`${fraunces.variable} ${instrumentSans.variable} ${instrumentSerif.variable}`}
+    >
       <body className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1 pb-20 md:pb-0 page-enter">{children}</main>
