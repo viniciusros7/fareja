@@ -38,5 +38,5 @@ export async function POST(request: NextRequest) {
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 });
 
-  return NextResponse.json({ avatar_url: url });
+  return NextResponse.json({ avatar_url: `${url}?v=${Date.now()}` });
 }
