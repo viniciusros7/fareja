@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Edit2, Check, X, Bell, BellOff, ExternalLink,
   MessageCircle, Heart, FileText, Award, ShieldCheck,
-  Loader2, ChevronRight, Store,
+  Loader2, ChevronRight, Store, Camera,
 } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
 import { useRole } from "@/lib/hooks/useRole";
@@ -89,6 +89,12 @@ export default function PerfilPage() {
   const [editBio, setEditBio] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarMsg, setAvatarMsg] = useState<{ text: string; ok: boolean } | null>(null);
+
   useEffect(() => {
     if (userLoading || !user) return;
     Promise.all([
@@ -146,6 +152,52 @@ export default function PerfilPage() {
     });
   }
 
+  function handleAvatarFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarMsg({ text: "Arquivo muito grande. Máximo 5MB.", ok: false });
+      return;
+    }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setAvatarMsg({ text: "Tipo inválido. Use JPEG, PNG ou WebP.", ok: false });
+      return;
+    }
+    setAvatarMsg(null);
+    setAvatarFile(file);
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    setAvatarPreview(URL.createObjectURL(file));
+    e.target.value = "";
+  }
+
+  function cancelAvatarUpload() {
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    setAvatarMsg(null);
+  }
+
+  async function saveAvatar() {
+    if (!avatarFile) return;
+    setUploadingAvatar(true);
+    setAvatarMsg(null);
+    const fd = new FormData();
+    fd.append("avatar", avatarFile);
+    const res = await fetch("/api/profile/avatar", { method: "POST", body: fd });
+    const data = await res.json();
+    setUploadingAvatar(false);
+    if (!res.ok) {
+      setAvatarMsg({ text: data.error ?? "Erro no upload.", ok: false });
+      return;
+    }
+    setProfileData((prev) => prev ? { ...prev, avatar_url: data.avatar_url } : prev);
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    setAvatarMsg({ text: "Foto atualizada!", ok: true });
+    setTimeout(() => setAvatarMsg(null), 3000);
+  }
+
   if (userLoading || loadingData) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -185,17 +237,61 @@ export default function PerfilPage() {
           {/* Avatar + Info */}
           <div className="flex items-start gap-4 sm:gap-6">
             {/* Avatar */}
-            <div className="shrink-0">
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={displayName}
-                  className="w-20 h-20 sm:w-28 sm:h-28 rounded-full object-cover ring-2 ring-earth-100"
-                />
-              ) : (
-                <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-2xl sm:text-3xl font-bold ring-2 ring-earth-100">
-                  {initials}
+            <div className="shrink-0 flex flex-col items-center gap-1.5">
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleAvatarFileChange}
+              />
+              <div className="relative group">
+                {(avatarPreview ?? avatarUrl) ? (
+                  <img
+                    src={avatarPreview ?? avatarUrl!}
+                    alt={displayName}
+                    className="w-20 h-20 sm:w-28 sm:h-28 rounded-full object-cover ring-2 ring-earth-100"
+                  />
+                ) : (
+                  <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-2xl sm:text-3xl font-bold ring-2 ring-earth-100">
+                    {initials}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => avatarInputRef.current?.click()}
+                  className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center"
+                  aria-label="Trocar foto de perfil"
+                >
+                  <Camera className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              </div>
+
+              {/* Avatar action row */}
+              {avatarFile && !uploadingAvatar && (
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={saveAvatar}
+                    className="flex items-center gap-1 px-2 py-1 bg-brand-600 text-white text-[10px] font-semibold rounded-lg hover:bg-brand-700 transition-colors"
+                  >
+                    <Check className="w-3 h-3" />
+                    Salvar
+                  </button>
+                  <button
+                    onClick={cancelAvatarUpload}
+                    className="flex items-center gap-1 px-2 py-1 bg-earth-100 text-earth-600 text-[10px] font-semibold rounded-lg hover:bg-earth-200 transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 </div>
+              )}
+              {uploadingAvatar && (
+                <Loader2 className="w-4 h-4 animate-spin text-earth-400" />
+              )}
+              {avatarMsg && (
+                <p className={`text-[10px] text-center leading-tight max-w-[5rem] ${avatarMsg.ok ? "text-forest-600" : "text-red-600"}`}>
+                  {avatarMsg.text}
+                </p>
               )}
             </div>
 
