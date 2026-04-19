@@ -17,7 +17,6 @@ export async function GET(request: NextRequest) {
       views_count, replies_count, likes_count,
       is_pinned, is_solved, status, created_at, updated_at,
       author:profiles!author_id(id, full_name, avatar_url, role),
-      kennel:kennels(id, name, slug, plan),
       category:forum_categories(id, name, slug)
     `)
     .limit(PAGE_SIZE);
@@ -45,11 +44,22 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  const topics = data ?? [];
+  const authorIds = [...new Set(topics.map((t) => t.author_id).filter(Boolean))];
+  const kennelMap = new Map<string, { id: string; name: string; slug: string; plan: string }>();
+
+  if (authorIds.length > 0) {
+    const { data: kennels } = await supabase
+      .from("kennels")
+      .select("id, name, slug, plan, owner_id")
+      .in("owner_id", authorIds)
+      .eq("status", "approved");
+    for (const k of kennels ?? []) kennelMap.set(k.owner_id, { id: k.id, name: k.name, slug: k.slug, plan: k.plan });
+  }
+
   return NextResponse.json({
-    topics: data ?? [],
-    nextCursor: data && data.length === PAGE_SIZE
-      ? data[data.length - 1].updated_at
-      : null,
+    topics: topics.map((t) => ({ ...t, kennel: kennelMap.get(t.author_id) ?? null })),
+    nextCursor: topics.length === PAGE_SIZE ? topics[topics.length - 1].updated_at : null,
   });
 }
 
@@ -88,7 +98,6 @@ export async function POST(request: NextRequest) {
       views_count, replies_count, likes_count,
       is_pinned, is_solved, status, created_at, updated_at,
       author:profiles!author_id(id, full_name, avatar_url, role),
-      kennel:kennels(id, name, slug, plan),
       category:forum_categories(id, name, slug)
     `)
     .single();
@@ -97,5 +106,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ topic }, { status: 201 });
+  const { data: kennelRow } = await supabase
+    .from("kennels")
+    .select("id, name, slug, plan")
+    .eq("owner_id", user.id)
+    .eq("status", "approved")
+    .maybeSingle();
+
+  return NextResponse.json({ topic: { ...topic, kennel: kennelRow ?? null } }, { status: 201 });
 }

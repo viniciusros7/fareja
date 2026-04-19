@@ -15,7 +15,6 @@ export async function GET(
       views_count, replies_count, likes_count,
       is_pinned, is_solved, status, created_at, updated_at,
       author:profiles!author_id(id, full_name, avatar_url, role),
-      kennel:kennels(id, name, slug, plan),
       category:forum_categories(id, name, slug)
     `)
     .eq("id", id)
@@ -25,12 +24,19 @@ export async function GET(
     return NextResponse.json({ error: "Tópico não encontrado" }, { status: 404 });
   }
 
+  const { data: kennelRow } = await supabase
+    .from("kennels")
+    .select("id, name, slug, plan")
+    .eq("owner_id", topic.author_id)
+    .eq("status", "approved")
+    .maybeSingle();
+
   // increment views atomically (fire and forget — non-critical counter)
   supabase.rpc("increment_topic_views", { topic_id: id }).then(({ error }) => {
     if (error) console.error("[views_count] increment failed:", id, error.message);
   });
 
-  return NextResponse.json({ topic });
+  return NextResponse.json({ topic: { ...topic, kennel: kennelRow ?? null } });
 }
 
 export async function PATCH(
@@ -94,7 +100,6 @@ export async function PATCH(
       views_count, replies_count, likes_count,
       is_pinned, is_solved, status, created_at, updated_at,
       author:profiles!author_id(id, full_name, avatar_url, role),
-      kennel:kennels(id, name, slug, plan),
       category:forum_categories(id, name, slug)
     `)
     .single();
@@ -103,7 +108,14 @@ export async function PATCH(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ topic: updated });
+  const { data: kennelRow } = await supabase
+    .from("kennels")
+    .select("id, name, slug, plan")
+    .eq("owner_id", updated.author_id)
+    .eq("status", "approved")
+    .maybeSingle();
+
+  return NextResponse.json({ topic: { ...updated, kennel: kennelRow ?? null } });
 }
 
 export async function DELETE(
