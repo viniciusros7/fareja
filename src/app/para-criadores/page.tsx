@@ -7,7 +7,6 @@ import {
   Users, PenLine, Sparkles, PawPrint, Zap, Crown,
   Stethoscope, Store, MessageCircle, Camera, Gem, Trophy,
 } from "lucide-react";
-import { useUser } from "@/lib/hooks/useUser";
 import { useRole } from "@/lib/hooks/useRole";
 
 const plans = [
@@ -104,8 +103,7 @@ const steps = [
 ];
 
 function ParaCriadoresContent() {
-  const { user } = useUser();
-  const { isKennel, isApprover, isAdmin, loading: roleLoading } = useRole();
+  const { isKennel, loading: roleLoading } = useRole();
   const [founderCount, setFounderCount] = useState<number | null>(null);
 
   useEffect(() => {
@@ -114,17 +112,13 @@ function ParaCriadoresContent() {
       .then((d) => { if (d) setFounderCount(d.founders); });
   }, []);
 
-  const showFounderBanner = !!user && (isKennel || isApprover || isAdmin);
+  const showFounderBanner = true;
 
-  const ctaHref = !user
-    ? "/login"
-    : isKennel
+  const ctaHref = isKennel
     ? "/painel"
     : "/criadores/candidatar";
 
-  const ctaLabel = !user
-    ? "Entrar para candidatar"
-    : isKennel
+  const ctaLabel = isKennel
     ? "Acessar meu painel"
     : "Candidatar meu canil";
 
