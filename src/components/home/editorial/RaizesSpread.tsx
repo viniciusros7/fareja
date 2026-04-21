@@ -39,10 +39,7 @@ export default function RaizesSpread() {
           color: var(--color-terracotta-deep);
           font-variation-settings: 'opsz' 144, 'SOFT' 100;
         }
-        .spread {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 1.25rem;
+        .spread-main {
           margin-bottom: 3rem;
         }
         .spread-caption {
@@ -55,16 +52,11 @@ export default function RaizesSpread() {
           display: flex;
           justify-content: space-between;
         }
-        .spread-side {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1.25rem;
-        }
         .pull-quote {
           padding: 2.5rem 0 2rem;
           border-top: 0.5px solid rgba(26,15,7,0.15);
           border-bottom: 0.5px solid rgba(26,15,7,0.15);
-          margin: 2.5rem 0 2rem;
+          margin: 0 0 2rem;
           position: relative;
         }
         .pull-quote::before {
@@ -128,14 +120,15 @@ export default function RaizesSpread() {
           transition: gap 0.25s, color 0.25s;
         }
         .raizes-link:hover { gap: 1.25rem; color: var(--color-ink); }
+        .raizes-links {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
         @media (min-width: 768px) {
-          .spread {
-            grid-template-columns: 1.3fr 1fr;
-            gap: 2rem;
-          }
-          .spread-side {
-            grid-template-columns: 1fr;
-            gap: 2rem;
+          .raizes-links {
+            flex-direction: row;
+            gap: 2.5rem;
           }
         }
       `}</style>
@@ -149,64 +142,23 @@ export default function RaizesSpread() {
           </h2>
         </div>
 
-        <div className="spread">
-          {/* Main photo */}
-          <figure>
-            <div className="relative w-full" style={{ aspectRatio: "4/5" }}>
-              <Image
-                src="/canil-good-leisure/good-leisure-02-two-adults.webp"
-                alt="Dois Golden Retrievers adultos no Canil Good Leisure"
-                fill
-                quality={85}
-                sizes="(min-width: 768px) 56vw, 100vw"
-                className="object-cover"
-                style={{ filter: "saturate(1.05)" }}
-              />
-            </div>
-            <figcaption className="spread-caption">
-              <span>Matriz e Padreador</span>
-              <span>Plantel 2025</span>
-            </figcaption>
-          </figure>
-
-          {/* Side photos */}
-          <div className="spread-side">
-            <figure>
-              <div className="relative w-full" style={{ aspectRatio: "3/4" }}>
-                <Image
-                  src="/canil-good-leisure/good-leisure-03-running.webp"
-                  alt="Golden Retriever correndo no gramado"
-                  fill
-                  quality={85}
-                  sizes="(min-width: 768px) 22vw, 48vw"
-                  className="object-cover"
-                  style={{ filter: "saturate(1.05)" }}
-                />
-              </div>
-              <figcaption className="spread-caption">
-                <span>Área de recreação</span>
-                <span>1.200m²</span>
-              </figcaption>
-            </figure>
-            <figure>
-              <div className="relative w-full" style={{ aspectRatio: "3/4" }}>
-                <Image
-                  src="/canil-good-leisure/good-leisure-04-ball.webp"
-                  alt="Golden Retriever brincando com bola"
-                  fill
-                  quality={85}
-                  sizes="(min-width: 768px) 22vw, 48vw"
-                  className="object-cover"
-                  style={{ filter: "saturate(1.05)" }}
-                />
-              </div>
-              <figcaption className="spread-caption">
-                <span>Socialização</span>
-                <span>Diária</span>
-              </figcaption>
-            </figure>
+        <figure className="spread-main">
+          <div className="relative w-full" style={{ aspectRatio: "4/5" }}>
+            <Image
+              src="/canil-good-leisure/good-leisure-02-two-adults.webp"
+              alt="Dois Golden Retrievers adultos no Canil Good Leisure"
+              fill
+              quality={85}
+              sizes="100vw"
+              className="object-cover"
+              style={{ filter: "saturate(1.05)" }}
+            />
           </div>
-        </div>
+          <figcaption className="spread-caption">
+            <span>Matriz e Padreador</span>
+            <span>Plantel 2025</span>
+          </figcaption>
+        </figure>
 
         <div className="pull-quote">
           <blockquote>
@@ -218,10 +170,16 @@ export default function RaizesSpread() {
           </cite>
         </div>
 
-        <Link href="/canis" className="raizes-link">
-          Conhecer o canil fundador{" "}
-          <span aria-hidden="true">→</span>
-        </Link>
+        <div className="raizes-links">
+          <Link href="/canis" className="raizes-link">
+            Conhecer o canil fundador{" "}
+            <span aria-hidden="true">→</span>
+          </Link>
+          <Link href="/canil-fundador" className="raizes-link">
+            Ler história completa{" "}
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
       </section>
     </>
   );

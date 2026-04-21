@@ -1,6 +1,7 @@
 import TopbarEditorial from "@/components/home/editorial/TopbarEditorial";
 import HeroEditorial from "@/components/home/editorial/HeroEditorial";
 import FichaTecnica from "@/components/home/editorial/FichaTecnica";
+import MiniCTACriadores from "@/components/home/editorial/MiniCTACriadores";
 import FundadoresBanner from "@/components/home/editorial/FundadoresBanner";
 import RaizesSpread from "@/components/home/editorial/RaizesSpread";
 import Manifesto from "@/components/home/editorial/Manifesto";
@@ -14,6 +15,7 @@ export default function HomePage() {
       <TopbarEditorial />
       <HeroEditorial />
       <FichaTecnica />
+      <MiniCTACriadores />
       <FundadoresBanner />
       <RaizesSpread />
       <Manifesto />
