@@ -330,12 +330,36 @@ function energyLabel(n: number | null): string {
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 const TOTAL_STEPS = QUESTIONS.length; // 10
+const QUIZ_STORAGE_KEY = "quiz-result";
+const QUIZ_TTL_MS = 24 * 60 * 60 * 1000;
 
 export default function EncontrarRacaPage() {
   const [breeds, setBreeds]             = useState<BreedRow[]>([]);
   const [breedsLoading, setBreedsLoading] = useState(true);
   const [step, setStep]                 = useState(0);
   const [answers, setAnswers]           = useState<Answers>(EMPTY_ANSWERS);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(QUIZ_STORAGE_KEY);
+      if (raw) {
+        const { answers: saved, completedAt } = JSON.parse(raw) as { answers: Answers; completedAt: number };
+        if (Date.now() - completedAt < QUIZ_TTL_MS) {
+          setAnswers(saved);
+          setStep(TOTAL_STEPS + 1);
+        } else {
+          sessionStorage.removeItem(QUIZ_STORAGE_KEY);
+        }
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (step !== TOTAL_STEPS + 1) return;
+    try {
+      sessionStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify({ answers, completedAt: Date.now() }));
+    } catch {}
+  }, [step, answers]);
 
   useEffect(() => {
     createClient()
@@ -371,6 +395,7 @@ export default function EncontrarRacaPage() {
   }
 
   function reset() {
+    try { sessionStorage.removeItem(QUIZ_STORAGE_KEY); } catch {}
     setAnswers(EMPTY_ANSWERS);
     setStep(0);
   }
