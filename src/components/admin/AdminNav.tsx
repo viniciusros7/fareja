@@ -9,7 +9,7 @@ import {
 import { useRole } from "@/lib/hooks/useRole";
 
 export function AdminNav({ active }: { active: string }) {
-  const { role } = useRole();
+  const { role, isAdmin } = useRole();
   const [pendingCount, setPendingCount] = useState<number | null>(null);
 
   useEffect(() => {
@@ -18,21 +18,19 @@ export function AdminNav({ active }: { active: string }) {
       .then((data) => { if (data) setPendingCount(data.count); });
   }, []);
 
+  const approverTabs = [
+    { key: "candidaturas", label: "Candidaturas", href: "/admin/candidaturas", icon: ClipboardList, badge: pendingCount },
+    { key: "mensagens", label: "Mensagens", href: "/admin/mensagens", icon: MessageCircle },
+  ];
+
   const superAdminTabs = [
-    { key: "aprovar", label: "Aprovar canis", href: "/admin/aprovar", icon: ShieldCheck },
     { key: "candidaturas", label: "Candidaturas", href: "/admin/candidaturas", icon: ClipboardList, badge: pendingCount },
     { key: "financeiro", label: "Financeiro", href: "/admin/financeiro", icon: DollarSign },
     { key: "usuarios", label: "Usuários", href: "/admin/usuarios", icon: Users },
     { key: "configuracoes", label: "Configurações", href: "/admin/configuracoes", icon: Settings },
   ];
 
-  const approverTabs = [
-    { key: "aprovar", label: "Aprovar canis", href: "/admin/aprovar", icon: ShieldCheck },
-    { key: "candidaturas", label: "Candidaturas", href: "/admin/candidaturas", icon: ClipboardList, badge: pendingCount },
-    { key: "mensagens", label: "Mensagens", href: "/admin/mensagens", icon: MessageCircle },
-  ];
-
-  const tabs = role === "super_admin" ? superAdminTabs : approverTabs;
+  const tabs = isAdmin ? superAdminTabs : approverTabs;
 
   return (
     <div className="flex gap-1 p-1 bg-earth-100 rounded-lg mb-6 overflow-x-auto">
