@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, Search, User, PawPrint, LogOut, ChevronDown, Layers, Bell } from "lucide-react";
+import { Menu, X, Search, User, PawPrint, LogOut, ChevronDown, Layers, ShieldCheck } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
 import { useRole } from "@/lib/hooks/useRole";
 import { useNotificationCount } from "@/lib/hooks/useNotificationCount";
@@ -18,6 +18,7 @@ const allNavLinks = [
 
 function UserMenu() {
   const { user, signOut, loading } = useUser();
+  const { isApprover } = useRole();
   const [open, setOpen] = useState(false);
   const unread = useNotificationCount();
 
@@ -87,6 +88,16 @@ function UserMenu() {
               <PawPrint className="w-4 h-4 text-earth-400" />
               Meu painel
             </Link>
+            {isApprover && (
+              <Link
+                href="/admin/candidaturas"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm text-earth-700 hover:bg-earth-50 transition-colors"
+              >
+                <ShieldCheck className="w-4 h-4 text-earth-400" />
+                Painel admin
+              </Link>
+            )}
             <button
               onClick={() => { setOpen(false); signOut(); }}
               className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
