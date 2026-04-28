@@ -1,38 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import {
-  DollarSign, ShieldCheck, Users, Settings, Loader2, Construction,
+  DollarSign, Loader2, Construction,
 } from "lucide-react";
 import { useRole } from "@/lib/hooks/useRole";
 import { useUser } from "@/lib/hooks/useUser";
 import AccessDenied from "@/components/layout/AccessDenied";
-
-function AdminNav() {
-  const tabs = [
-    { key: "aprovar", label: "Aprovar canis", href: "/admin/aprovar", icon: ShieldCheck },
-    { key: "financeiro", label: "Financeiro", href: "/admin/financeiro", icon: DollarSign },
-    { key: "usuarios", label: "Usuários", href: "/admin/usuarios", icon: Users },
-    { key: "configuracoes", label: "Configurações", href: "/admin/configuracoes", icon: Settings },
-  ];
-
-  return (
-    <div className="flex gap-1 p-1 bg-earth-100 rounded-lg mb-6 overflow-x-auto">
-      {tabs.map(({ key, label, href, icon: Icon }) => (
-        <Link
-          key={key}
-          href={href}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
-            key === "financeiro" ? "bg-white text-earth-900 shadow-sm" : "text-earth-500 hover:text-earth-700"
-          }`}
-        >
-          <Icon className="w-4 h-4" />
-          {label}
-        </Link>
-      ))}
-    </div>
-  );
-}
+import { AdminNav } from "@/components/admin/AdminNav";
 
 export default function AdminFinanceiroPage() {
   const { user, loading: userLoading } = useUser();
@@ -62,7 +36,7 @@ export default function AdminFinanceiroPage() {
         </div>
       </div>
 
-      <AdminNav />
+      <AdminNav active="financeiro" />
 
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="w-14 h-14 rounded-2xl bg-earth-100 flex items-center justify-center mb-4">
