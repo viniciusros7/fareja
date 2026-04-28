@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  ChevronRight, ChevronLeft, CheckCircle2, Loader2, PawPrint,
+  ChevronRight, ChevronLeft, CheckCircle2, Loader2, PawPrint, Clock,
 } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
+import { useApplicationStatus } from "@/lib/hooks/useApplicationStatus";
 
 const STATES = [
   "AC","AL","AM","AP","BA","CE","DF","ES","GO","MA",
@@ -78,6 +79,7 @@ const STEPS = ["Você", "Seu canil", "Qualificações", "Revisão"];
 
 export default function CandidatarPage() {
   const { user, loading } = useUser();
+  const { status: appStatus, application: appData, loading: appLoading } = useApplicationStatus();
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormData>(EMPTY);
@@ -137,7 +139,13 @@ export default function CandidatarPage() {
     }
   }
 
-  if (loading) {
+  useEffect(() => {
+    if (!appLoading && appStatus === "approved") {
+      router.push("/painel/canil");
+    }
+  }, [appStatus, appLoading, router]);
+
+  if (loading || appLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <Loader2 className="w-6 h-6 animate-spin text-earth-400" />
@@ -163,6 +171,27 @@ export default function CandidatarPage() {
         >
           Entrar
         </Link>
+      </div>
+    );
+  }
+
+  if (appStatus === "pending") {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 py-12 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-amber-100 flex items-center justify-center mb-4">
+          <Clock className="w-7 h-7 text-amber-500" />
+        </div>
+        <h2 className="font-display text-xl font-semibold text-earth-900 mb-2">
+          Candidatura em análise
+        </h2>
+        <p className="text-sm text-earth-500 mb-1">
+          {appData?.kennel_name ? (
+            <>Sua candidatura para <span className="font-medium text-earth-700">{appData.kennel_name}</span> está sendo revisada.</>
+          ) : (
+            "Sua candidatura está sendo revisada."
+          )}
+        </p>
+        <p className="text-sm text-earth-400">Nossa equipe entrará em contato em breve.</p>
       </div>
     );
   }

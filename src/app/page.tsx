@@ -1,5 +1,6 @@
 import TopbarEditorial from "@/components/home/editorial/TopbarEditorial";
 import HeroEditorial from "@/components/home/editorial/HeroEditorial";
+import { ApplicationStatusBanner } from "@/components/ApplicationStatusBanner";
 import FichaTecnica from "@/components/home/editorial/FichaTecnica";
 import MiniCTACriadores from "@/components/home/editorial/MiniCTACriadores";
 import FundadoresBanner from "@/components/home/editorial/FundadoresBanner";
@@ -13,6 +14,7 @@ export default function HomePage() {
   return (
     <div style={{ background: "var(--color-cream-bg)", overflow: "hidden" }}>
       <TopbarEditorial />
+      <ApplicationStatusBanner />
       <HeroEditorial />
       <FichaTecnica />
       <MiniCTACriadores />

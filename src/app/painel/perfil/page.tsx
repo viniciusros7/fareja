@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
 import { useRole } from "@/lib/hooks/useRole";
+import { ApplicationStatusBanner } from "@/components/ApplicationStatusBanner";
 
 interface ProfileStats {
   forum_topics: number;
@@ -229,6 +230,8 @@ export default function PerfilPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-0">
+
+      <ApplicationStatusBanner />
 
       {/* ── Profile Header ── */}
       <div className="bg-white rounded-2xl border border-earth-200 overflow-hidden">
