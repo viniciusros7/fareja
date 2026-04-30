@@ -1,26 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import ImageUpload from "@/components/ImageUpload";
+import { ArrowLeft, Loader2, ImagePlus, X } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
-
-interface UploadResult {
-  url: string;
-  thumbnailUrl?: string;
-  key: string;
-}
+import { ImageCropper } from "@/components/feed/ImageCropper";
 
 export default function NovoPostPage() {
   const router = useRouter();
   const { user, loading } = useUser();
   const [content, setContent] = useState("");
-  const [images, setImages] = useState<string[]>([]);
-  const [thumbnails, setThumbnails] = useState<string[]>([]);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [croppedFile, setCroppedFile] = useState<File | null>(null);
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    return () => { if (localPreview) URL.revokeObjectURL(localPreview); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) return null;
 
@@ -35,14 +36,30 @@ export default function NovoPostPage() {
     );
   }
 
-  function handleUpload(results: UploadResult[]) {
-    setImages((prev) => [...prev, ...results.map((r) => r.url)]);
-    setThumbnails((prev) => [...prev, ...results.map((r) => r.thumbnailUrl ?? r.url)]);
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPendingFile(file);
+    e.target.value = "";
+  }
+
+  function handleCropComplete(cropped: File) {
+    if (localPreview) URL.revokeObjectURL(localPreview);
+    const url = URL.createObjectURL(cropped);
+    setCroppedFile(cropped);
+    setLocalPreview(url);
+    setPendingFile(null);
+  }
+
+  function handleCancelPreview() {
+    if (localPreview) URL.revokeObjectURL(localPreview);
+    setCroppedFile(null);
+    setLocalPreview(null);
   }
 
   async function submit() {
-    if (!content.trim() && images.length === 0) {
-      setError("Adicione texto ou pelo menos uma imagem.");
+    if (!content.trim() && !croppedFile) {
+      setError("Adicione texto ou uma imagem.");
       return;
     }
     setError(null);
@@ -51,7 +68,7 @@ export default function NovoPostPage() {
     const res = await fetch("/api/posts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content, images, thumbnails }),
+      body: JSON.stringify({ content, images: [], thumbnails: [] }),
     });
 
     const data = await res.json();
@@ -67,6 +84,14 @@ export default function NovoPostPage() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-6">
+      {pendingFile && (
+        <ImageCropper
+          file={pendingFile}
+          onCropComplete={handleCropComplete}
+          onCancel={() => setPendingFile(null)}
+        />
+      )}
+
       <div className="flex items-center gap-3 mb-6">
         <Link
           href="/comunidade/feed"
@@ -86,17 +111,40 @@ export default function NovoPostPage() {
           maxLength={2000}
           className="w-full px-4 py-3 text-sm border border-earth-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400/30 focus:border-brand-400 placeholder:text-earth-300 resize-none"
         />
-
         <div className="text-right text-[11px] text-earth-400 -mt-2">
           {content.length}/2000
         </div>
 
-        <ImageUpload onUpload={handleUpload} maxFiles={5} />
-
-        {images.length > 0 && (
-          <p className="text-xs text-forest-600 font-medium">
-            {images.length} imagem{images.length !== 1 ? "ns" : ""} prontas para publicar.
-          </p>
+        {localPreview ? (
+          <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-earth-100">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={localPreview} alt="Preview" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={handleCancelPreview}
+              className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ) : (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-earth-600 border border-earth-200 rounded-xl hover:bg-earth-50 transition-colors"
+            >
+              <ImagePlus className="w-4 h-4" />
+              Adicionar foto
+            </button>
+          </>
         )}
 
         {error && (
