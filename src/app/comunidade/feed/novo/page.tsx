@@ -1,27 +1,23 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Loader2, ImagePlus, X } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
 import { ImageCropper } from "@/components/feed/ImageCropper";
+import { compressImageForFeed } from "@/lib/image/compress-client";
 
 export default function NovoPostPage() {
   const router = useRouter();
   const { user, loading } = useUser();
   const [content, setContent] = useState("");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
-  const [croppedFile, setCroppedFile] = useState<File | null>(null);
-  const [localPreview, setLocalPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ url: string; key: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    return () => { if (localPreview) URL.revokeObjectURL(localPreview); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   if (loading) return null;
 
@@ -43,22 +39,43 @@ export default function NovoPostPage() {
     e.target.value = "";
   }
 
-  function handleCropComplete(cropped: File) {
-    if (localPreview) URL.revokeObjectURL(localPreview);
-    const url = URL.createObjectURL(cropped);
-    setCroppedFile(cropped);
-    setLocalPreview(url);
+  async function handleCropComplete(croppedFile: File) {
     setPendingFile(null);
+    setUploading(true);
+    setError(null);
+    try {
+      const compressed = await compressImageForFeed(croppedFile);
+      const fd = new FormData();
+      fd.append("file", compressed);
+      const res = await fetch("/api/posts/preview-upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Erro no upload.");
+      } else {
+        setPreview({ url: data.url, key: data.key });
+      }
+    } catch {
+      setError("Erro de conexão. Tente novamente.");
+    } finally {
+      setUploading(false);
+    }
   }
 
-  function handleCancelPreview() {
-    if (localPreview) URL.revokeObjectURL(localPreview);
-    setCroppedFile(null);
-    setLocalPreview(null);
+  async function handleCancelPreview() {
+    if (!preview) return;
+    const { key } = preview;
+    setPreview(null);
+    try {
+      await fetch("/api/posts/preview-delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key }),
+      });
+    } catch {}
   }
 
   async function submit() {
-    if (!content.trim() && !croppedFile) {
+    if (!content.trim() && !preview) {
       setError("Adicione texto ou uma imagem.");
       return;
     }
@@ -68,7 +85,11 @@ export default function NovoPostPage() {
     const res = await fetch("/api/posts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content, images: [], thumbnails: [] }),
+      body: JSON.stringify({
+        content,
+        image_url: preview?.url ?? null,
+        image_key: preview?.key ?? null,
+      }),
     });
 
     const data = await res.json();
@@ -115,10 +136,17 @@ export default function NovoPostPage() {
           {content.length}/2000
         </div>
 
-        {localPreview ? (
+        {uploading && (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-earth-50 border border-earth-200 text-sm text-earth-500">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Otimizando e enviando…
+          </div>
+        )}
+
+        {!uploading && preview && (
           <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-earth-100">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={localPreview} alt="Preview" className="w-full h-full object-cover" />
+            <img src={preview.url} alt="Preview" className="w-full h-full object-cover" />
             <button
               type="button"
               onClick={handleCancelPreview}
@@ -127,7 +155,9 @@ export default function NovoPostPage() {
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
-        ) : (
+        )}
+
+        {!uploading && !preview && (
           <>
             <input
               ref={fileInputRef}
@@ -153,7 +183,7 @@ export default function NovoPostPage() {
 
         <button
           onClick={submit}
-          disabled={submitting}
+          disabled={submitting || uploading}
           className="w-full py-3 bg-brand-600 text-white text-sm font-semibold rounded-xl hover:bg-brand-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
         >
           {submitting ? (
