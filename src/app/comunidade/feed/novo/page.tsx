@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Loader2, ImagePlus, X } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
 import { ImageCropper } from "@/components/feed/ImageCropper";
+import { EmojiPickerButton } from "@/components/feed/EmojiPickerButton";
 import { compressImageForFeed } from "@/lib/image/compress-client";
 
 export default function NovoPostPage() {
@@ -18,6 +19,7 @@ export default function NovoPostPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const captionRef = useRef<HTMLTextAreaElement>(null);
 
   if (loading) return null;
 
@@ -74,6 +76,21 @@ export default function NovoPostPage() {
     } catch {}
   }
 
+  function handleEmojiSelect(emoji: string) {
+    const ta = captionRef.current;
+    const start = ta?.selectionStart ?? content.length;
+    const end = ta?.selectionEnd ?? content.length;
+    const newContent = content.slice(0, start) + emoji + content.slice(end);
+    setContent(newContent);
+    requestAnimationFrame(() => {
+      if (ta) {
+        ta.selectionStart = start + emoji.length;
+        ta.selectionEnd = start + emoji.length;
+        ta.focus();
+      }
+    });
+  }
+
   async function submit() {
     if (!content.trim() && !preview) {
       setError("Adicione texto ou uma imagem.");
@@ -124,16 +141,23 @@ export default function NovoPostPage() {
       </div>
 
       <div className="space-y-4">
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Compartilhe algo com a comunidade…"
-          rows={5}
-          maxLength={2000}
-          className="w-full px-4 py-3 text-sm border border-earth-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400/30 focus:border-brand-400 placeholder:text-earth-300 resize-none"
-        />
-        <div className="text-right text-[11px] text-earth-400 -mt-2">
-          {content.length}/2000
+        {/* Caption with emoji picker */}
+        <div className="relative">
+          <textarea
+            ref={captionRef}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Compartilhe algo com a comunidade…"
+            rows={5}
+            maxLength={2000}
+            className="w-full px-4 py-3 pb-9 text-sm border border-earth-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400/30 focus:border-brand-400 placeholder:text-earth-300 resize-none"
+          />
+          <div className="absolute bottom-2.5 left-3">
+            <EmojiPickerButton onSelect={handleEmojiSelect} />
+          </div>
+          <span className="absolute bottom-3 right-3 text-[11px] text-earth-400 pointer-events-none">
+            {content.length}/2000
+          </span>
         </div>
 
         {uploading && (
