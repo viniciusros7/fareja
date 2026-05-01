@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { useUser } from "./useUser";
 
-// Module-level shared state — one fetch serves all consumers
+// Module-level shared state — one fetch + one channel per session
 let _count = 0;
 let _initialized = false;
+let _channelUserId: string | null = null;
 const _subscribers = new Set<(c: number) => void>();
 
 function broadcast(c: number) {
@@ -26,6 +28,26 @@ async function initCount() {
   }
 }
 
+function initRealtime(userId: string) {
+  if (_channelUserId === userId) return;
+  _channelUserId = userId;
+
+  const supabase = createClient();
+  supabase
+    .channel(`notif-count-${userId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "notifications",
+        filter: `recipient_id=eq.${userId}`,
+      },
+      () => { broadcast(_count + 1); }
+    )
+    .subscribe();
+}
+
 export function decrementNotificationCount() {
   broadcast(Math.max(0, _count - 1));
 }
@@ -44,6 +66,7 @@ export function useNotificationCount(): number {
     if (!user) {
       _count = 0;
       _initialized = false;
+      _channelUserId = null;
       setCount(0);
       return;
     }
@@ -52,6 +75,7 @@ export function useNotificationCount(): number {
     _subscribers.add(fn);
     setCount(_count);
     initCount();
+    initRealtime(user.id);
 
     return () => { _subscribers.delete(fn); };
   }, [user?.id, loading]); // eslint-disable-line react-hooks/exhaustive-deps
