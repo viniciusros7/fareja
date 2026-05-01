@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, Search, User, PawPrint, LogOut, ChevronDown, Layers, ShieldCheck } from "lucide-react";
+import { Menu, X, Search, User, PawPrint, LogOut, ChevronDown, Layers, ShieldCheck, Bell } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
 import { useRole } from "@/lib/hooks/useRole";
 import { useNotificationCount } from "@/lib/hooks/useNotificationCount";
@@ -98,6 +98,21 @@ function UserMenu() {
                 Painel admin
               </Link>
             )}
+            <Link
+              href="/notificacoes"
+              onClick={() => setOpen(false)}
+              className="flex items-center justify-between px-4 py-2.5 text-sm text-earth-700 hover:bg-earth-50 transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-earth-400" />
+                Notificações
+              </span>
+              {unread > 0 && (
+                <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center">
+                  {unread > 9 ? "9+" : unread}
+                </span>
+              )}
+            </Link>
             <button
               onClick={() => { setOpen(false); signOut(); }}
               className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
