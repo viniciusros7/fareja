@@ -1,50 +1,100 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
-  Dog, Star, Eye, MessageCircle, Camera,
+  Dog, Star, Camera, Clock,
   Plus, Users, Heart, PawPrint, Search, ArrowRight,
 } from "lucide-react";
 import { useRole } from "@/lib/hooks/useRole";
 import { useUser } from "@/lib/hooks/useUser";
 import { useFavorites } from "@/lib/hooks/useFavorites";
+import { createClient } from "@/lib/supabase/client";
 
-const kennelStats = [
-  { label: "Filhotes disponíveis", value: "3", icon: Dog, change: "+1 esta semana", cls: "bg-forest-50 text-forest-600" },
-  { label: "Avaliação Fareja", value: "★ 5.0", icon: Star, change: "47 avaliações", cls: "bg-brand-50 text-brand-600" },
-  { label: "Visitas ao perfil", value: "1.284", icon: Eye, change: "+18% vs mês anterior", cls: "bg-blue-50 text-blue-700" },
-  { label: "Mensagens", value: "12", icon: MessageCircle, change: "3 não lidas", cls: "bg-purple-50 text-purple-700" },
-];
+interface KennelStats {
+  puppiesAvailable: number;
+  rating: number | null;
+  ratingCount: number;
+  postsCount: number;
+}
 
-const recentActivity = [
-  { text: "Novo filhote Golden cadastrado", time: "Há 2 horas" },
-  { text: "Avaliação 5★ de Camila S.", time: "Há 1 dia" },
-  { text: "Post no feed recebeu 89 curtidas", time: "Há 2 dias" },
-  { text: "Fernanda L. entrou em contato", time: "Há 3 dias" },
-  { text: "Perfil visitado 47 vezes hoje", time: "Hoje" },
-];
+function KennelDashboard({ name, userId }: { name: string; userId: string }) {
+  const [stats, setStats] = useState<KennelStats | null>(null);
 
-function KennelDashboard({ name }: { name: string }) {
+  useEffect(() => {
+    const supabase = createClient();
+
+    async function load() {
+      const [kennelRes, puppiesRes, postsRes] = await Promise.all([
+        supabase
+          .from("kennels")
+          .select("id, rating, rating_count")
+          .eq("owner_id", userId)
+          .single(),
+        supabase
+          .from("puppies")
+          .select("id", { count: "exact", head: true })
+          .eq("owner_id", userId)
+          .eq("status", "available"),
+        supabase
+          .from("posts")
+          .select("id", { count: "exact", head: true })
+          .eq("author_id", userId)
+          .eq("status", "published"),
+      ]);
+
+      setStats({
+        puppiesAvailable: puppiesRes.count ?? 0,
+        rating: kennelRes.data?.rating ?? null,
+        ratingCount: kennelRes.data?.rating_count ?? 0,
+        postsCount: postsRes.count ?? 0,
+      });
+    }
+
+    load();
+  }, [userId]);
+
   return (
     <div className="space-y-6">
       <div className="p-5 rounded-xl bg-gradient-to-r from-brand-100 to-brand-50 border border-brand-200">
         <h2 className="text-base font-semibold text-earth-900 mb-1">Bem-vindo, {name}!</h2>
         <p className="text-sm text-earth-500">
-          Seu canil teve 1.284 visitas este mês. Continue postando no feed para aumentar o engajamento.
+          Gerencie filhotes, atualize seu perfil e publique no feed da comunidade.
         </p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {kennelStats.map((s) => (
-          <div key={s.label} className={`p-4 rounded-xl ${s.cls} border border-transparent`}>
-            <div className="flex items-center justify-between mb-2">
-              <s.icon className="w-4 h-4 opacity-60" />
-            </div>
-            <div className="text-xl font-semibold">{s.value}</div>
-            <div className="text-[11px] opacity-70 mt-0.5">{s.label}</div>
-            <div className="text-[10px] opacity-50 mt-1">{s.change}</div>
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="p-4 rounded-xl bg-forest-50 border border-forest-100">
+          <Dog className="w-4 h-4 text-forest-600 mb-2 opacity-70" />
+          <div className="text-xl font-semibold text-forest-700">
+            {stats === null ? "—" : stats.puppiesAvailable}
           </div>
-        ))}
+          <div className="text-[11px] text-forest-600 mt-0.5">Filhotes disponíveis</div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-brand-50 border border-brand-100">
+          <Star className="w-4 h-4 text-brand-600 mb-2 opacity-70" />
+          <div className="text-xl font-semibold text-brand-700">
+            {stats === null
+              ? "—"
+              : stats.rating !== null
+              ? `★ ${stats.rating.toFixed(1)}`
+              : "Sem avaliações"}
+          </div>
+          <div className="text-[11px] text-brand-600 mt-0.5">
+            {stats !== null && stats.ratingCount > 0
+              ? `${stats.ratingCount} avaliações`
+              : "Avaliação Fareja"}
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
+          <Camera className="w-4 h-4 text-blue-600 mb-2 opacity-70" />
+          <div className="text-xl font-semibold text-blue-700">
+            {stats === null ? "—" : stats.postsCount}
+          </div>
+          <div className="text-[11px] text-blue-600 mt-0.5">Posts publicados</div>
+        </div>
       </div>
 
       <div>
@@ -64,7 +114,7 @@ function KennelDashboard({ name }: { name: string }) {
           </Link>
 
           <Link
-            href="/painel/comunidade"
+            href="/comunidade/feed/novo"
             className="flex items-center gap-3 p-4 rounded-xl border border-earth-200 bg-white hover:bg-brand-50 hover:border-brand-200 transition-colors group"
           >
             <div className="w-9 h-9 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center group-hover:bg-brand-200">
@@ -91,16 +141,11 @@ function KennelDashboard({ name }: { name: string }) {
         </div>
       </div>
 
-      <div>
-        <h3 className="text-sm font-semibold text-earth-700 mb-3">Atividade recente</h3>
-        <div className="rounded-xl border border-earth-200 bg-white divide-y divide-earth-100">
-          {recentActivity.map((a, i) => (
-            <div key={i} className="px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-earth-700">{a.text}</span>
-              <span className="text-xs text-earth-400 shrink-0 ml-3">{a.time}</span>
-            </div>
-          ))}
-        </div>
+      <div className="p-4 rounded-xl border border-earth-200 bg-white flex items-start gap-3">
+        <Clock className="w-4 h-4 text-earth-300 mt-0.5 shrink-0" />
+        <p className="text-xs text-earth-400 leading-relaxed">
+          Histórico de atividades e métricas de visitas estarão disponíveis em breve.
+        </p>
       </div>
     </div>
   );
@@ -202,6 +247,6 @@ export default function PainelPage() {
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? "Usuário";
   const firstName = displayName.split(" ")[0];
 
-  if (isKennel) return <KennelDashboard name={firstName} />;
+  if (isKennel && user) return <KennelDashboard name={firstName} userId={user.id} />;
   return <ClientDashboard name={firstName} />;
 }

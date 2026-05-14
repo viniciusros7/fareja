@@ -266,17 +266,35 @@ create policy "Remove favorito" on public.favorites for delete using (auth.uid()
 -- FUNÇÕES
 -- ============================================================
 
--- Criar perfil automaticamente quando usuário se registra
+-- Criar perfil automaticamente quando usuário se registra,
+-- marcar pioneiro (primeiros 100 clientes) e inserir notificação de boas-vindas
 create or replace function public.handle_new_user()
 returns trigger as $$
+declare
+  client_count integer;
 begin
-  insert into public.profiles (id, email, full_name, avatar_url)
+  -- Conta clientes existentes (antes deste novo usuário)
+  select count(*) into client_count
+  from public.profiles
+  where role = 'client';
+
+  insert into public.profiles (id, email, full_name, avatar_url, is_pioneer)
   values (
     new.id,
     new.email,
     coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', ''),
-    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', null)
+    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', null),
+    client_count < 100  -- primeiros 100 são pioneiros
   );
+
+  insert into public.notifications (user_id, type, content, link)
+  values (
+    new.id,
+    'welcome',
+    'Bem-vindo ao Fareja! 🐾 Explore os canis verificados e participe da comunidade.',
+    '/buscar'
+  );
+
   return new;
 end;
 $$ language plpgsql security definer;
@@ -352,6 +370,7 @@ create table public.breeds (
   temperament_pt text,
   description_pt text,
   image_url text,
+  image_source text check (image_source in ('curated', 'kennel_provided', 'dog_api')),
   created_at timestamptz default now()
 );
 
@@ -656,7 +675,11 @@ create trigger trg_forum_replies_count
 alter table public.profiles
   add column if not exists bio text,
   add column if not exists privacy_accepted boolean not null default false,
-  add column if not exists privacy_accepted_at timestamptz;
+  add column if not exists privacy_accepted_at timestamptz,
+  add column if not exists is_pioneer boolean not null default false,
+  add column if not exists is_founder boolean not null default false,
+  add column if not exists founder_number integer,
+  add column if not exists founder_free_until timestamptz;
 
 create table public.notifications (
   id uuid primary key default gen_random_uuid(),
@@ -672,3 +695,118 @@ create policy "notifications_select" on public.notifications for select using (a
 create policy "notifications_update" on public.notifications for update using (auth.uid() = user_id);
 create index notifications_user_created on public.notifications(user_id, created_at desc);
 create index notifications_user_unread on public.notifications(user_id, read) where read = false;
+
+-- ============================================================
+-- FASE 13C — CANDIDATURAS DE CANIL
+-- ============================================================
+
+create table public.kennel_applications (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references public.profiles(id) on delete cascade,
+
+  -- Dados pessoais
+  full_name   text not null,
+  email       text not null,
+  phone       text not null,
+  city        text not null,
+  state       text not null,
+
+  -- Dados do canil
+  kennel_name   text not null,
+  breeds        text[] not null default '{}',
+  years_active  int not null default 0,
+  website       text,
+  instagram     text,
+
+  -- Qualificações (checkboxes)
+  cbkc_registered  boolean not null default false,
+  health_tests     boolean not null default false,
+  written_contract boolean not null default false,
+  litters_per_year int not null default 0,
+
+  -- Score calculado no servidor
+  score           int not null default 0,
+  suggested_plan  text not null default 'verificado' check (suggested_plan in ('verificado','premium','elite')),
+
+  -- Fluxo de aprovação
+  status        text not null default 'pending' check (status in ('pending','approved','rejected')),
+  reject_reason text,
+  reviewed_by   uuid references public.profiles(id),
+  reviewed_at   timestamptz,
+
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.kennel_applications enable row level security;
+
+-- Candidato: vê e cria apenas suas próprias
+create policy "applications_select_own" on public.kennel_applications
+  for select using (auth.uid() = user_id);
+
+create policy "applications_insert_own" on public.kennel_applications
+  for insert with check (auth.uid() = user_id);
+
+-- Admin: acesso total
+create policy "admin_all" on public.kennel_applications
+  for all using (
+    exists (
+      select 1 from public.profiles
+      where id = auth.uid()
+        and role in ('approver','super_admin')
+    )
+  );
+
+create index kennel_applications_status on public.kennel_applications(status, created_at desc);
+create index kennel_applications_user   on public.kennel_applications(user_id);
+
+-- ============================================================
+-- FASE 14B + F15 — MIGRAÇÃO
+-- Execute este bloco no SQL Editor se o banco já existe
+-- ============================================================
+
+-- 1. Novas colunas em profiles (is_pioneer, is_founder, founder_number, founder_free_until)
+alter table public.profiles
+  add column if not exists is_pioneer boolean not null default false,
+  add column if not exists is_founder boolean not null default false,
+  add column if not exists founder_number integer,
+  add column if not exists founder_free_until timestamptz;
+
+-- 2. Atualiza o CHECK constraint para incluir 'welcome'
+alter table public.notifications
+  drop constraint if exists notifications_type_check;
+
+alter table public.notifications
+  add constraint notifications_type_check
+    check (type in ('comment_reply', 'new_post', 'kennel_update', 'admin_alert', 'welcome'));
+
+-- 3. Atualiza handle_new_user: pioneiro + notificação de boas-vindas
+create or replace function public.handle_new_user()
+returns trigger as $$
+declare
+  client_count integer;
+begin
+  select count(*) into client_count
+  from public.profiles
+  where role = 'client';
+
+  insert into public.profiles (id, email, full_name, avatar_url, is_pioneer)
+  values (
+    new.id,
+    new.email,
+    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', ''),
+    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', null),
+    client_count < 100
+  );
+
+  insert into public.notifications (user_id, type, content, link)
+  values (
+    new.id,
+    'welcome',
+    'Bem-vindo ao Fareja! 🐾 Explore os canis verificados e participe da comunidade.',
+    '/buscar'
+  );
+
+  return new;
+end;
+$$ language plpgsql security definer;

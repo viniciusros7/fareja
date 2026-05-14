@@ -15,7 +15,7 @@ const kennelNavItems = [
   { href: "/painel/filhotes", label: "Filhotes", icon: Dog },
   { href: "/painel/reprodutores", label: "Reprodutores", icon: PawPrint },
   { href: "/painel/avaliacoes", label: "Avaliações", icon: Star },
-  { href: "/painel/comunidade", label: "Comunidade", icon: MessageCircle },
+  { href: "/comunidade", label: "Comunidade", icon: MessageCircle },
   { href: "/painel/parceiros", label: "Parceiros", icon: Stethoscope },
   { href: "/painel/configuracoes", label: "Configurações", icon: Settings },
 ];
@@ -30,7 +30,7 @@ const clientNavItems = [
 export default function PainelLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, loading: userLoading } = useUser();
-  const { loading: roleLoading, isKennel } = useRole();
+  const { loading: roleLoading, isKennel, isApprover } = useRole();
 
   if (userLoading || roleLoading) {
     return (
@@ -68,7 +68,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
     );
   }
 
-  const navItems = isKennel ? kennelNavItems : clientNavItems;
+  const navItems = (isKennel || isApprover) ? kennelNavItems : clientNavItems;
   const displayName = user.user_metadata?.full_name ?? user.email ?? "Usuário";
   const initials = displayName
     .split(" ")
@@ -84,7 +84,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
           {initials}
         </div>
         <div>
-          {isKennel ? (
+          {(isKennel || isApprover) ? (
             <div className="flex items-center gap-2">
               <h1 className="font-display text-xl font-semibold text-brand-900">
                 Painel do Criador
@@ -101,6 +101,27 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
           )}
           <p className="text-xs text-earth-500">{user.email}</p>
         </div>
+      </div>
+
+      {/* Mobile nav — fora do flex row para não esticar pela altura do content */}
+      <div className="md:hidden overflow-x-auto pb-2 mb-4 flex gap-1.5">
+        {navItems.slice(0, 5).map((item) => {
+          const active = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
+                active
+                  ? "bg-brand-100 text-brand-600 border-brand-300"
+                  : "bg-white text-earth-500 border-earth-200"
+              }`}
+            >
+              <item.icon className="w-3 h-3" />
+              {item.label}
+            </Link>
+          );
+        })}
       </div>
 
       <div className="flex gap-6">
@@ -128,27 +149,6 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
             })}
           </div>
         </nav>
-
-        {/* Mobile nav */}
-        <div className="md:hidden overflow-x-auto pb-2 mb-4 flex gap-1.5 w-full">
-          {navItems.slice(0, 5).map((item) => {
-            const active = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
-                  active
-                    ? "bg-brand-100 text-brand-600 border-brand-300"
-                    : "bg-white text-earth-500 border-earth-200"
-                }`}
-              >
-                <item.icon className="w-3 h-3" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">{children}</div>

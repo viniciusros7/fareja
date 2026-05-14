@@ -13,36 +13,17 @@ export async function POST(
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
   }
 
-  const { data: existing } = await supabase
-    .from("forum_topic_likes")
-    .select("topic_id")
-    .eq("topic_id", id)
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("toggle_topic_like", {
+    p_topic_id: id,
+    p_user_id: user.id,
+  });
 
-  const { data: topic } = await supabase
-    .from("forum_topics")
-    .select("likes_count")
-    .eq("id", id)
-    .single();
-
-  if (!topic) {
-    return NextResponse.json({ error: "Tópico não encontrado" }, { status: 404 });
+  if (error || !data?.[0]) {
+    return NextResponse.json(
+      { error: error?.message ?? "Erro ao processar like" },
+      { status: 500 }
+    );
   }
 
-  if (existing) {
-    await supabase.from("forum_topic_likes").delete().eq("topic_id", id).eq("user_id", user.id);
-    await supabase
-      .from("forum_topics")
-      .update({ likes_count: Math.max(0, topic.likes_count - 1) })
-      .eq("id", id);
-    return NextResponse.json({ liked: false, likes_count: Math.max(0, topic.likes_count - 1) });
-  }
-
-  await supabase.from("forum_topic_likes").insert({ topic_id: id, user_id: user.id });
-  await supabase
-    .from("forum_topics")
-    .update({ likes_count: topic.likes_count + 1 })
-    .eq("id", id);
-  return NextResponse.json({ liked: true, likes_count: topic.likes_count + 1 });
+  return NextResponse.json({ liked: data[0].liked, likes_count: data[0].likes_count });
 }

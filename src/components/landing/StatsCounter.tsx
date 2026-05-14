@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useCountUp } from "@/hooks/useCountUp";
 
 interface StatItem {
   end: number;
@@ -15,29 +16,6 @@ const stats: StatItem[] = [
   { end: 4, suffix: "", label: "canis verificados" },
   { end: 35, suffix: "+", label: "anos de experiência no ramo" },
 ];
-
-function useCountUp(end: number, duration: number, started: boolean) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!started) return;
-    let frame: number;
-    const startTime = performance.now();
-
-    const tick = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(eased * end));
-      if (progress < 1) frame = requestAnimationFrame(tick);
-    };
-
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [end, duration, started]);
-
-  return count;
-}
 
 function StatBlock({ stat, started }: { stat: StatItem; started: boolean }) {
   const count = useCountUp(stat.end, 1400, started);

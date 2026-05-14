@@ -1,26 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import ImageUpload from "@/components/ImageUpload";
+import { ArrowLeft, Loader2, ImagePlus, X } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
-
-interface UploadResult {
-  url: string;
-  thumbnailUrl?: string;
-  key: string;
-}
+import { ImageCropper } from "@/components/feed/ImageCropper";
+import { EmojiPickerButton } from "@/components/feed/EmojiPickerButton";
+import { compressImageForFeed } from "@/lib/image/compress-client";
 
 export default function NovoPostPage() {
   const router = useRouter();
   const { user, loading } = useUser();
   const [content, setContent] = useState("");
-  const [images, setImages] = useState<string[]>([]);
-  const [thumbnails, setThumbnails] = useState<string[]>([]);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<{ url: string; key: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const captionRef = useRef<HTMLTextAreaElement>(null);
 
   if (loading) return null;
 
@@ -35,14 +34,66 @@ export default function NovoPostPage() {
     );
   }
 
-  function handleUpload(results: UploadResult[]) {
-    setImages((prev) => [...prev, ...results.map((r) => r.url)]);
-    setThumbnails((prev) => [...prev, ...results.map((r) => r.thumbnailUrl ?? r.url)]);
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPendingFile(file);
+    e.target.value = "";
+  }
+
+  async function handleCropComplete(croppedFile: File) {
+    setPendingFile(null);
+    setUploading(true);
+    setError(null);
+    try {
+      const compressed = await compressImageForFeed(croppedFile);
+      const fd = new FormData();
+      fd.append("file", compressed);
+      const res = await fetch("/api/posts/preview-upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Erro no upload.");
+      } else {
+        setPreview({ url: data.url, key: data.key });
+      }
+    } catch {
+      setError("Erro de conexão. Tente novamente.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleCancelPreview() {
+    if (!preview) return;
+    const { key } = preview;
+    setPreview(null);
+    try {
+      await fetch("/api/posts/preview-delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key }),
+      });
+    } catch {}
+  }
+
+  function handleEmojiSelect(emoji: string) {
+    const ta = captionRef.current;
+    const start = ta?.selectionStart ?? content.length;
+    const end = ta?.selectionEnd ?? content.length;
+    const newContent = content.slice(0, start) + emoji + content.slice(end);
+    setContent(newContent);
+    requestAnimationFrame(() => {
+      if (ta) {
+        ta.selectionStart = start + emoji.length;
+        ta.selectionEnd = start + emoji.length;
+        ta.focus();
+      }
+    });
   }
 
   async function submit() {
-    if (!content.trim() && images.length === 0) {
-      setError("Adicione texto ou pelo menos uma imagem.");
+    if (!content.trim() && !preview) {
+      setError("Adicione texto ou uma imagem.");
       return;
     }
     setError(null);
@@ -51,7 +102,11 @@ export default function NovoPostPage() {
     const res = await fetch("/api/posts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content, images, thumbnails }),
+      body: JSON.stringify({
+        content,
+        image_url: preview?.url ?? null,
+        image_key: preview?.key ?? null,
+      }),
     });
 
     const data = await res.json();
@@ -67,6 +122,14 @@ export default function NovoPostPage() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-6">
+      {pendingFile && (
+        <ImageCropper
+          file={pendingFile}
+          onCropComplete={handleCropComplete}
+          onCancel={() => setPendingFile(null)}
+        />
+      )}
+
       <div className="flex items-center gap-3 mb-6">
         <Link
           href="/comunidade/feed"
@@ -78,25 +141,64 @@ export default function NovoPostPage() {
       </div>
 
       <div className="space-y-4">
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Compartilhe algo com a comunidade…"
-          rows={5}
-          maxLength={2000}
-          className="w-full px-4 py-3 text-sm border border-earth-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400/30 focus:border-brand-400 placeholder:text-earth-300 resize-none"
-        />
-
-        <div className="text-right text-[11px] text-earth-400 -mt-2">
-          {content.length}/2000
+        {/* Caption with emoji picker */}
+        <div className="relative">
+          <textarea
+            ref={captionRef}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Compartilhe algo com a comunidade…"
+            rows={5}
+            maxLength={2000}
+            className="w-full px-4 py-3 pb-9 text-sm border border-earth-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400/30 focus:border-brand-400 placeholder:text-earth-300 resize-none"
+          />
+          <div className="absolute bottom-2.5 left-3">
+            <EmojiPickerButton onSelect={handleEmojiSelect} />
+          </div>
+          <span className="absolute bottom-3 right-3 text-[11px] text-earth-400 pointer-events-none">
+            {content.length}/2000
+          </span>
         </div>
 
-        <ImageUpload onUpload={handleUpload} maxFiles={5} />
+        {uploading && (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-earth-50 border border-earth-200 text-sm text-earth-500">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Otimizando e enviando…
+          </div>
+        )}
 
-        {images.length > 0 && (
-          <p className="text-xs text-forest-600 font-medium">
-            {images.length} imagem{images.length !== 1 ? "ns" : ""} prontas para publicar.
-          </p>
+        {!uploading && preview && (
+          <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-earth-100">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={preview.url} alt="Preview" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={handleCancelPreview}
+              className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
+        {!uploading && !preview && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-earth-600 border border-earth-200 rounded-xl hover:bg-earth-50 transition-colors"
+            >
+              <ImagePlus className="w-4 h-4" />
+              Adicionar foto
+            </button>
+          </>
         )}
 
         {error && (
@@ -105,7 +207,7 @@ export default function NovoPostPage() {
 
         <button
           onClick={submit}
-          disabled={submitting}
+          disabled={submitting || uploading}
           className="w-full py-3 bg-brand-600 text-white text-sm font-semibold rounded-xl hover:bg-brand-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
         >
           {submitting ? (

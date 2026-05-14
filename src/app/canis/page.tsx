@@ -105,7 +105,7 @@ function KennelCard({
         {kennel.breeds.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
             {kennel.breeds.slice(0, 3).map((b) => (
-              <span key={b} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700">
+              <span key={b} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-brand-50 text-brand-700">
                 {b}
               </span>
             ))}
@@ -392,7 +392,7 @@ export default function CanisPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="card-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {visibleKennels.map((kennel) => (
               <KennelCard
                 key={kennel.id}

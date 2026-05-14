@@ -1,20 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  CheckCircle2, Star, ArrowRight, ShieldCheck, TrendingUp,
+  CheckCircle2, ArrowRight, ShieldCheck, TrendingUp,
   Users, PenLine, Sparkles, PawPrint, Zap, Crown,
-  Stethoscope, Store, MessageCircle, Camera, Gem, Lock, Loader2,
+  Stethoscope, Store, MessageCircle, Camera, Gem, Trophy,
 } from "lucide-react";
-import { useUser } from "@/lib/hooks/useUser";
 import { useRole } from "@/lib/hooks/useRole";
 
 const plans = [
   {
     id: "basic",
     name: "Canil Verificado",
-    price: "R$ 150",
-    period: "/mês",
     description: "Presença completa na plataforma com selo de verificação.",
     tier: "basic" as const,
     features: [
@@ -31,8 +29,6 @@ const plans = [
   {
     id: "premium",
     name: "Canil Premium",
-    price: "R$ 250",
-    period: "/mês",
     description: "Mais visibilidade e ferramentas para crescer.",
     tier: "premium" as const,
     features: [
@@ -49,8 +45,6 @@ const plans = [
   {
     id: "super_premium",
     name: "Canil Elite",
-    price: "R$ 350",
-    period: "/mês",
     description: "O máximo em visibilidade, parcerias e engajamento.",
     tier: "super_premium" as const,
     features: [
@@ -108,39 +102,25 @@ const steps = [
   { num: "4", title: "Canil aprovado", desc: "Perfil visível para todos os compradores da plataforma." },
 ];
 
-export default function ParaCriadoresPage() {
-  const { user, loading: userLoading } = useUser();
-  const { role, loading: roleLoading } = useRole();
+function ParaCriadoresContent() {
+  const { isKennel, loading: roleLoading } = useRole();
+  const [founderCount, setFounderCount] = useState<number | null>(null);
 
-  if (userLoading || roleLoading) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-earth-400" />
-      </div>
-    );
-  }
+  useEffect(() => {
+    fetch("/api/stats/growth")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d) setFounderCount(d.founders); });
+  }, []);
 
-  if (user && role === "client") {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 py-12 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-earth-100 flex items-center justify-center mb-4">
-          <Lock className="w-7 h-7 text-earth-400" />
-        </div>
-        <h2 className="font-display text-xl font-semibold text-earth-900 mb-2">
-          Esta área é exclusiva para criadores verificados do Fareja.
-        </h2>
-        <p className="text-sm text-earth-500 max-w-sm mx-auto mb-6 leading-relaxed">
-          Para cadastrar seu canil na plataforma, preencha o formulário de interesse e nossa equipe entrará em contato.
-        </p>
-        <Link
-          href="/para-criadores/cadastro"
-          className="px-6 py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors"
-        >
-          Quero cadastrar meu canil
-        </Link>
-      </div>
-    );
-  }
+  const showFounderBanner = true;
+
+  const ctaHref = isKennel
+    ? "/painel"
+    : "/criadores/candidatar";
+
+  const ctaLabel = isKennel
+    ? "Acessar meu painel"
+    : "Candidatar meu canil";
 
   return (
     <div className="overflow-hidden">
@@ -161,6 +141,74 @@ export default function ParaCriadoresPage() {
           </p>
         </div>
       </section>
+
+      {/* Founder Program Banner — only for kennel/admin */}
+      {showFounderBanner && (
+        <section className="max-w-3xl mx-auto px-4 pb-8">
+          <div className="relative overflow-hidden rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-amber-100/60 p-6">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/30 rounded-full -translate-y-8 translate-x-8 pointer-events-none" />
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+                  <Trophy className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display text-lg font-semibold text-amber-900 leading-tight">
+                    Programa Canis Fundadores
+                  </h2>
+                </div>
+              </div>
+
+              <ul className="space-y-1.5 mb-5 text-sm text-amber-800 leading-relaxed">
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-500 shrink-0 mt-0.5">•</span>
+                  Isenção total de pagamento por <strong>1 ano</strong>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-500 shrink-0 mt-0.5">•</span>
+                  Após o primeiro ano, <strong>preço exclusivo permanente de fundador</strong>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-500 shrink-0 mt-0.5">•</span>
+                  Badge <strong>Canil Fundador 🏆</strong> no perfil e nos resultados de busca
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-500 shrink-0 mt-0.5">•</span>
+                  Prioridade em novos recursos e funcionalidades
+                </li>
+              </ul>
+
+              {/* Counter */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 max-w-xs">
+                  <div className="flex items-center justify-between text-[11px] font-medium mb-1.5 text-amber-700">
+                    <span>Vagas de fundador preenchidas</span>
+                    {founderCount !== null && (
+                      <span className="font-semibold">{founderCount} / 10</span>
+                    )}
+                  </div>
+                  <div className="h-1.5 bg-amber-200 rounded-full overflow-hidden">
+                    {founderCount !== null && (
+                      <div
+                        className="h-full bg-amber-500 rounded-full transition-all duration-700"
+                        style={{ width: `${Math.min(100, founderCount * 10)}%` }}
+                      />
+                    )}
+                  </div>
+                </div>
+                {founderCount !== null && founderCount < 10 && (
+                  <span className="text-xs text-amber-600 shrink-0 font-medium">
+                    {10 - founderCount} {10 - founderCount === 1 ? "vaga restante" : "vagas restantes"}
+                  </span>
+                )}
+                {founderCount !== null && founderCount >= 10 && (
+                  <span className="text-xs font-semibold text-amber-700 shrink-0">Esgotado</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Benefits */}
       <section className="max-w-4xl mx-auto px-4 pb-16">
@@ -185,7 +233,7 @@ export default function ParaCriadoresPage() {
               Planos
             </h2>
             <p className="text-sm text-earth-500">
-              Investimento mensal com cancelamento a qualquer momento.
+              Complete o questionário de candidatura para receber seu plano sugerido e conhecer os valores.
             </p>
           </div>
 
@@ -227,12 +275,6 @@ export default function ParaCriadoresPage() {
                     {plan.name}
                   </h3>
                   <p className="text-xs text-earth-500 mb-4">{plan.description}</p>
-                  <div className="flex items-baseline gap-1 mb-5">
-                    <span className={`font-display text-3xl font-semibold ${isSuperPremium ? "text-brand-600" : "text-brand-600"}`}>
-                      {plan.price}
-                    </span>
-                    <span className="text-sm text-earth-400">{plan.period}</span>
-                  </div>
 
                   <ul className="space-y-2.5 mb-6">
                     {plan.features.map((f) => (
@@ -245,7 +287,8 @@ export default function ParaCriadoresPage() {
                     ))}
                   </ul>
 
-                  <button
+                  <Link
+                    href={roleLoading ? "#" : ctaHref}
                     className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-colors ${
                       isSuperPremium
                         ? "bg-gradient-to-r from-brand-600 to-brand-500 text-white hover:from-brand-700 hover:to-brand-600 shadow-md"
@@ -254,9 +297,9 @@ export default function ParaCriadoresPage() {
                         : "bg-brand-100 text-brand-600 hover:bg-brand-200"
                     }`}
                   >
-                    Começar agora
+                    {ctaLabel}
                     <ArrowRight className="w-4 h-4" />
-                  </button>
+                  </Link>
                 </div>
               );
             })}
@@ -320,14 +363,18 @@ export default function ParaCriadoresPage() {
             criadores verificados.
           </p>
           <Link
-            href="/para-criadores/cadastro"
+            href={roleLoading ? "#" : ctaHref}
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-brand-600 text-white text-sm font-semibold rounded-full hover:bg-brand-700 transition-colors"
           >
             <Zap className="w-4 h-4" />
-            Cadastrar meu canil
+            {ctaLabel}
           </Link>
         </div>
       </section>
     </div>
   );
+}
+
+export default function ParaCriadoresPage() {
+  return <ParaCriadoresContent />;
 }

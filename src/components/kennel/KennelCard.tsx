@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Star, MapPin, CheckCircle2, Clock, PawPrint, Gem, Sparkles } from "lucide-react";
+import { Star, MapPin, CheckCircle2, Clock, PawPrint, Gem, Sparkles, Shield } from "lucide-react";
 import type { Kennel } from "@/types";
 
 interface KennelCardProps {
@@ -16,80 +16,86 @@ export default function KennelCard({ kennel }: KennelCardProps) {
   return (
     <Link
       href={`/canil/${kennel.slug}`}
-      className="block rounded-xl border border-earth-200 bg-white card-hover group overflow-hidden"
+      className="block bg-white rounded-2xl border border-earth-100 overflow-hidden group transition-all duration-200 hover:shadow-[0_4px_20px_rgba(61,27,15,0.10)] hover:-translate-y-0.5 active:scale-[0.99]"
     >
-      {/* Cover image */}
-      <div className="relative h-32 w-full">
+      {/* Hero image */}
+      <div className="relative h-44 w-full overflow-hidden">
         <Image
-          src={`https://placedog.net/400/150?id=${imgId}`}
+          src={`https://placedog.net/600/220?id=${imgId}`}
           alt={kennel.name}
           fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 672px"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
         />
+        {/* Plan badge overlay */}
+        <div className="absolute top-3 right-3">
+          {kennel.plan === "super_premium" && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-md">
+              <Gem className="w-2.5 h-2.5" />
+              Elite
+            </span>
+          )}
+          {kennel.plan === "premium" && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-brand-600 text-white shadow-md">
+              <Sparkles className="w-2.5 h-2.5" />
+              Premium
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Content */}
-      <div className="p-5">
-        {/* Header */}
-        <div className="flex items-start gap-3.5 mb-3">
-          <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 border-2 border-white shadow-sm -mt-8">
+      <div className="p-4">
+        {/* Avatar + name row */}
+        <div className="flex items-start gap-3 -mt-8 mb-3">
+          <div className="relative w-14 h-14 rounded-full overflow-hidden shrink-0 border-[3px] border-white shadow-sm bg-earth-100">
             <Image
-              src={`https://placedog.net/48/48?id=${parseInt(kennel.id)}`}
+              src={`https://placedog.net/56/56?id=${parseInt(kennel.id)}`}
               alt={kennel.name}
               fill
               className="object-cover"
-              sizes="48px"
+              sizes="56px"
             />
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-[15px] font-semibold text-earth-900 group-hover:text-brand-600 transition-colors truncate">
+          <div className="flex-1 min-w-0 pt-8">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h3 className="text-[15px] font-semibold text-earth-900 group-hover:text-brand-600 transition-colors truncate leading-tight">
                 {kennel.name}
               </h3>
-              <span className="badge-verified">
-                <CheckCircle2 className="w-3 h-3" />
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-forest-50 text-forest-600">
+                <CheckCircle2 className="w-2.5 h-2.5" />
                 Verificado
               </span>
-              {kennel.plan === "premium" && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-600 text-white">
-                  <Sparkles className="w-2.5 h-2.5" />
-                  Premium
-                </span>
-              )}
-              {kennel.plan === "super_premium" && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-brand-600 to-brand-500 text-white">
-                  <Gem className="w-2.5 h-2.5" />
-                  Elite
-                </span>
-              )}
             </div>
-            <div className="flex items-center gap-3 mt-1 text-xs text-earth-400">
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3 h-3" />
-                {kennel.city}, {kennel.state}
-              </span>
-              <span>{kennel.years_active} anos</span>
-              <span>{kennel.kc_registry}</span>
+            <div className="flex items-center gap-1 mt-0.5 text-[11px] text-earth-400">
+              <MapPin className="w-3 h-3 shrink-0" />
+              <span className="truncate">{kennel.city}, {kennel.state}</span>
+              <span className="text-earth-200 mx-1">·</span>
+              <span>{kennel.years_active}a</span>
             </div>
           </div>
         </div>
 
-        {/* Breeds */}
+        {/* Breed chips */}
         <div className="flex flex-wrap gap-1.5 mb-3">
-          {kennel.breeds.map((breed) => (
+          {kennel.breeds.slice(0, 3).map((breed) => (
             <span
               key={breed}
-              className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-700"
+              className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-brand-50 text-brand-700"
             >
               {breed}
             </span>
           ))}
+          {kennel.breeds.length > 3 && (
+            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-earth-100 text-earth-500">
+              +{kennel.breeds.length - 3}
+            </span>
+          )}
         </div>
 
         {/* Bottom row */}
-        <div className="flex items-center justify-between pt-3 border-t border-earth-100">
-          <div className="flex items-center gap-4 text-xs">
+        <div className="flex items-center justify-between pt-3 border-t border-earth-50">
+          <div className="flex items-center gap-3 text-xs">
             {/* Rating */}
             <div className="flex items-center gap-1">
               <Star className="w-3.5 h-3.5 text-brand-400 fill-brand-400" />
@@ -104,7 +110,7 @@ export default function KennelCard({ kennel }: KennelCardProps) {
             {/* Availability */}
             {availableCount > 0 ? (
               <span className="flex items-center gap-1 text-forest-500 font-medium">
-                <PawPrint className="w-3 h-3" />
+                <PawPrint className="w-3 h-3 fill-forest-100 stroke-forest-500" />
                 {availableCount} disponíve{availableCount === 1 ? "l" : "is"}
               </span>
             ) : (
@@ -116,20 +122,21 @@ export default function KennelCard({ kennel }: KennelCardProps) {
           </div>
 
           {/* Verification badges */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             {kennel.microchip && (
-              <span className="w-6 h-6 rounded-full bg-forest-50 text-forest-500 flex items-center justify-center text-[10px]" title="Microchip">
+              <span
+                title="Microchip"
+                className="w-5 h-5 rounded-full bg-forest-50 text-forest-600 flex items-center justify-center text-[9px] font-bold"
+              >
                 μ
               </span>
             )}
-            {kennel.vaccines && (
-              <span className="w-6 h-6 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center text-[10px]" title="Vacinado">
-                V
-              </span>
-            )}
             {kennel.dna_tests && (
-              <span className="w-6 h-6 rounded-full bg-purple-50 text-purple-700 flex items-center justify-center text-[10px]" title="DNA">
-                D
+              <span
+                title="Testes DNA"
+                className="w-5 h-5 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center"
+              >
+                <Shield className="w-2.5 h-2.5" />
               </span>
             )}
           </div>

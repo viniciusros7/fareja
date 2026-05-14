@@ -14,7 +14,6 @@ function normalizeJoins(topic: ForumTopic): ForumTopic {
   return {
     ...topic,
     author: Array.isArray(topic.author) ? (topic.author[0] ?? null) : topic.author,
-    kennel: Array.isArray(topic.kennel) ? (topic.kennel[0] ?? null) : topic.kennel,
     category: Array.isArray(topic.category) ? (topic.category[0] ?? null) : topic.category,
   };
 }
@@ -23,7 +22,6 @@ function normalizeReplyJoins(reply: ForumReply): ForumReply {
   return {
     ...reply,
     author: Array.isArray(reply.author) ? (reply.author[0] ?? null) : reply.author,
-    kennel: Array.isArray(reply.kennel) ? (reply.kennel[0] ?? null) : reply.kennel,
   };
 }
 
@@ -60,7 +58,6 @@ export default async function TopicPage({ params }: Props) {
       views_count, replies_count, likes_count,
       is_pinned, is_solved, status, created_at, updated_at,
       author:profiles!author_id(id, full_name, avatar_url, role),
-      kennel:kennels(id, name, slug, plan),
       category:forum_categories(id, name, slug)
     `)
     .eq("id", topicId)
@@ -68,21 +65,35 @@ export default async function TopicPage({ params }: Props) {
 
   if (!rawTopic) notFound();
 
-  const topic = normalizeJoins(rawTopic as unknown as ForumTopic);
-
   const { data: rawReplies } = await supabase
     .from("forum_replies")
     .select(`
       id, topic_id, author_id, content, images,
       likes_count, is_best_answer, created_at,
-      author:profiles!author_id(id, full_name, avatar_url, role),
-      kennel:kennels(id, name, slug, plan)
+      author:profiles!author_id(id, full_name, avatar_url, role)
     `)
     .eq("topic_id", topicId)
     .order("is_best_answer", { ascending: false })
     .order("created_at", { ascending: true });
 
-  const replies = (rawReplies ?? []).map((r) => normalizeReplyJoins(r as unknown as ForumReply));
+  const allAuthorIds = [
+    rawTopic.author_id,
+    ...(rawReplies ?? []).map((r) => r.author_id),
+  ].filter(Boolean);
+  const uniqueAuthorIds = [...new Set(allAuthorIds)];
+  const kennelMap = new Map<string, { id: string; name: string; slug: string; plan: string }>();
+
+  if (uniqueAuthorIds.length > 0) {
+    const { data: kennels } = await supabase
+      .from("kennels")
+      .select("id, name, slug, plan, owner_id")
+      .in("owner_id", uniqueAuthorIds)
+      .eq("status", "approved");
+    for (const k of kennels ?? []) kennelMap.set(k.owner_id, { id: k.id, name: k.name, slug: k.slug, plan: k.plan });
+  }
+
+  const topic = normalizeJoins({ ...(rawTopic as unknown as ForumTopic), kennel: kennelMap.get(rawTopic.author_id) ?? null });
+  const replies = (rawReplies ?? []).map((r) => normalizeReplyJoins({ ...(r as unknown as ForumReply), kennel: kennelMap.get(r.author_id) ?? null }));
 
   // Check current user likes
   const { data: { user } } = await supabase.auth.getUser();

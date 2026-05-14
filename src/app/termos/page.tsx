@@ -60,7 +60,7 @@ export default function TermosPage() {
         <section id="aceitacao">
           <h2 className="font-display text-xl font-semibold text-earth-900 mb-3">1. Aceitação dos Termos</h2>
           <p>
-            Ao acessar ou utilizar a plataforma Fareja, disponível em <strong>fareja.com.br</strong> e em seus aplicativos associados, você declara ter lido, compreendido e concordado integralmente com estes Termos de Uso. Caso não concorde com qualquer disposição, não utilize a plataforma.
+            Ao acessar ou utilizar a plataforma Fareja, disponível em <strong>fareja.app.br</strong> e em seus aplicativos associados, você declara ter lido, compreendido e concordado integralmente com estes Termos de Uso. Caso não concorde com qualquer disposição, não utilize a plataforma.
           </p>
           <p className="mt-3">
             O uso da Fareja por menores de 18 anos é expressamente proibido. Ao se cadastrar, você confirma ter idade mínima de 18 anos e capacidade legal para aceitar estes termos.

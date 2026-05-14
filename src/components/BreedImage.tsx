@@ -134,12 +134,16 @@ export default function BreedImage({
       setSrc(fallbackUrl(fallbackSeed));
       return;
     }
-    fetch(`https://dog.ceo/api/breed/${slug}/images/random`)
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+
+    fetch(`https://dog.ceo/api/breed/${slug}/images/random`, { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
         setSrc(data.status === "success" && data.message ? data.message : fallbackUrl(fallbackSeed));
       })
-      .catch(() => setSrc(fallbackUrl(fallbackSeed)));
+      .catch(() => setSrc(fallbackUrl(fallbackSeed)))
+      .finally(() => clearTimeout(timeout));
   }, [nameEn, fallbackSeed]);
 
   if (!src) {

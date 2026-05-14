@@ -24,6 +24,7 @@ export type BreedRow = {
   temperament_pt: string | null;
   description_pt: string | null;
   image_url: string | null;
+  image_source: "curated" | "kennel_provided" | "dog_api" | null;
   created_at: string;
 };
 

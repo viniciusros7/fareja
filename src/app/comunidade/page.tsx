@@ -32,7 +32,7 @@ export default function ComunidadePage() {
           <p className="text-xs text-earth-500 truncate">Bastidores, filhotes e conteúdo exclusivo.</p>
         </div>
         <a
-          href="https://instagram.com/fareja"
+          href={process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://instagram.com/fareja"}
           target="_blank"
           rel="noopener noreferrer"
           className="px-4 py-2 bg-white border border-pink-200 text-pink-600 text-xs font-semibold rounded-full hover:bg-pink-50 transition-colors shrink-0"

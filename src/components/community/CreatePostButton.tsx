@@ -11,7 +11,7 @@ export default function CreatePostButton() {
   return (
     <Link
       href="/comunidade/feed/novo"
-      className="fixed bottom-6 right-6 z-30 w-14 h-14 rounded-full bg-brand-600 text-white shadow-lg hover:bg-brand-700 active:scale-95 transition-all flex items-center justify-center"
+      className="fixed bottom-20 md:bottom-6 right-6 z-30 w-14 h-14 rounded-full bg-brand-600 text-white shadow-lg hover:bg-brand-700 active:scale-95 transition-all flex items-center justify-center"
       aria-label="Criar post"
     >
       <Plus className="w-6 h-6" />

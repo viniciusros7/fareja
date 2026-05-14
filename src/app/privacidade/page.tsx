@@ -157,7 +157,7 @@ export default function PrivacidadePage() {
             <li><strong>Informação:</strong> ser informado sobre entidades com quem compartilhamos seus dados.</li>
           </ul>
           <p className="mt-3">
-            Para exercer seus direitos, entre em contato pelo e-mail <a href="mailto:privacidade@fareja.com.br" className="text-brand-600 hover:underline">privacidade@fareja.com.br</a>. Respondemos em até 15 dias, conforme o prazo legal.
+            Para exercer seus direitos, entre em contato pelo e-mail <a href="mailto:privacidade@fareja.app.br" className="text-brand-600 hover:underline">privacidade@fareja.app.br</a>. Respondemos em até 15 dias, conforme o prazo legal.
           </p>
         </section>
 
@@ -199,10 +199,10 @@ export default function PrivacidadePage() {
           <div className="mt-4 p-4 rounded-xl bg-earth-50 border border-earth-200">
             <p className="text-sm font-medium text-earth-800">Encarregado de Dados — Fareja</p>
             <a
-              href="mailto:privacidade@fareja.com.br"
+              href="mailto:privacidade@fareja.app.br"
               className="text-sm text-brand-600 hover:underline mt-1 block"
             >
-              privacidade@fareja.com.br
+              privacidade@fareja.app.br
             </a>
             <p className="text-xs text-earth-400 mt-1">
               Respondemos em até 15 dias úteis.

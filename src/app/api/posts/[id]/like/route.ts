@@ -13,36 +13,17 @@ export async function POST(
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
   }
 
-  const { data: existing } = await supabase
-    .from("post_likes")
-    .select("post_id")
-    .eq("post_id", id)
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("toggle_post_like", {
+    p_post_id: id,
+    p_user_id: user.id,
+  });
 
-  const { data: post } = await supabase
-    .from("posts")
-    .select("likes_count")
-    .eq("id", id)
-    .single();
-
-  if (!post) {
-    return NextResponse.json({ error: "Post não encontrado" }, { status: 404 });
+  if (error || !data?.[0]) {
+    return NextResponse.json(
+      { error: error?.message ?? "Erro ao processar like" },
+      { status: 500 }
+    );
   }
 
-  if (existing) {
-    await supabase.from("post_likes").delete().eq("post_id", id).eq("user_id", user.id);
-    await supabase
-      .from("posts")
-      .update({ likes_count: Math.max(0, post.likes_count - 1) })
-      .eq("id", id);
-    return NextResponse.json({ liked: false, likes_count: Math.max(0, post.likes_count - 1) });
-  }
-
-  await supabase.from("post_likes").insert({ post_id: id, user_id: user.id });
-  await supabase
-    .from("posts")
-    .update({ likes_count: post.likes_count + 1 })
-    .eq("id", id);
-  return NextResponse.json({ liked: true, likes_count: post.likes_count + 1 });
+  return NextResponse.json({ liked: data[0].liked, likes_count: data[0].likes_count });
 }

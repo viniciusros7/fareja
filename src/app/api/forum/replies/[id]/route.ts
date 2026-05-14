@@ -80,8 +80,7 @@ export async function PATCH(
     .select(`
       id, topic_id, author_id, content, images,
       likes_count, is_best_answer, created_at,
-      author:profiles!author_id(id, full_name, avatar_url, role),
-      kennel:kennels(id, name, slug, plan)
+      author:profiles!author_id(id, full_name, avatar_url, role)
     `)
     .single();
 
@@ -89,7 +88,14 @@ export async function PATCH(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ reply: updated });
+  const { data: kennelRow } = await supabase
+    .from("kennels")
+    .select("id, name, slug, plan")
+    .eq("owner_id", updated.author_id)
+    .eq("status", "approved")
+    .maybeSingle();
+
+  return NextResponse.json({ reply: { ...updated, kennel: kennelRow ?? null } });
 }
 
 export async function DELETE(
