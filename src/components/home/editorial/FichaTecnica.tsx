@@ -12,11 +12,10 @@ interface FichaItem {
   formatThousands?: boolean;
 }
 
-const items: FichaItem[] = [
-  { index: "01", label: "Acervo", desc: "Em cinofilia responsável", end: 37, suffix: "+" },
-  { index: "02", label: "Exemplares", desc: "Entusiastas de pet na comunidade", end: 6032, suffix: "+", formatThousands: true },
-  { index: "03", label: "Catálogo", desc: "Canis fundadores verificados", end: 4, suffix: "" },
-];
+interface Props {
+  profilesCount: number;
+  kennelsCount: number;
+}
 
 function FichaNumber({ item, started }: { item: FichaItem; started: boolean }) {
   const count = useCountUp(item.end, 1400, started);
@@ -32,9 +31,19 @@ function FichaNumber({ item, started }: { item: FichaItem; started: boolean }) {
   );
 }
 
-export default function FichaTecnica() {
+export default function FichaTecnica({ profilesCount, kennelsCount }: Props) {
   const [started, setStarted] = useState(false);
   const ref = useRef<HTMLElement>(null);
+
+  const items: FichaItem[] = [
+    { index: "01", label: "Acervo", desc: "Em cinofilia responsável", end: 37, suffix: "+" },
+    ...(profilesCount >= 50
+      ? [{ index: "02", label: "Exemplares", desc: "Entusiastas de pet na comunidade", end: profilesCount, suffix: "+", formatThousands: true }]
+      : []),
+    ...(kennelsCount >= 5
+      ? [{ index: "03", label: "Catálogo", desc: "Canis fundadores verificados", end: kennelsCount, suffix: "" }]
+      : []),
+  ];
 
   useEffect(() => {
     const el = ref.current;
@@ -147,7 +156,7 @@ export default function FichaTecnica() {
         }
         @media (min-width: 768px) {
           .ficha-list {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
           }
           .ficha-item {
             grid-template-columns: 1fr;
