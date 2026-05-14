@@ -7,8 +7,10 @@ import {
   MessageCircle, Heart, FileText, Award, ShieldCheck,
   Loader2, ChevronRight, Store, Camera,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useUser } from "@/lib/hooks/useUser";
 import { useRole } from "@/lib/hooks/useRole";
+import { useNotificationCount } from "@/lib/hooks/useNotificationCount";
 import { ApplicationStatusBanner } from "@/components/ApplicationStatusBanner";
 
 interface ProfileStats {
@@ -75,6 +77,8 @@ const planLabel: Record<string, string> = {
 export default function PerfilPage() {
   const { user, loading: userLoading } = useUser();
   const { isAdmin, isApprover, isKennel } = useRole();
+  const unreadNotifs = useNotificationCount();
+  const router = useRouter();
 
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [stats, setStats] = useState<ProfileStats | null>(null);
@@ -232,6 +236,28 @@ export default function PerfilPage() {
     <div className="max-w-2xl mx-auto space-y-0">
 
       <ApplicationStatusBanner />
+
+      {/* ── Notification card ── */}
+      <button
+        onClick={() => router.push("/notificacoes")}
+        className="w-full flex items-center gap-3 px-4 py-3 mt-3 bg-white rounded-2xl border border-earth-200 hover:bg-earth-50 transition-colors text-left"
+      >
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${unreadNotifs > 0 ? "bg-brand-100 text-brand-600" : "bg-earth-100 text-earth-400"}`}>
+          <Bell className="w-5 h-5" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-earth-800">Suas notificações</p>
+          <p className="text-xs text-earth-400">
+            {unreadNotifs > 0 ? `${unreadNotifs} nova${unreadNotifs !== 1 ? "s" : ""}` : "Nenhuma novidade"}
+          </p>
+        </div>
+        {unreadNotifs > 0 && (
+          <span className="shrink-0 min-w-[22px] h-[22px] px-1 rounded-full bg-brand-600 text-white text-[11px] font-bold flex items-center justify-center">
+            {unreadNotifs > 9 ? "9+" : unreadNotifs}
+          </span>
+        )}
+        <ChevronRight className="w-4 h-4 text-earth-400 shrink-0" />
+      </button>
 
       {/* ── Profile Header ── */}
       <div className="bg-white rounded-2xl border border-earth-200 overflow-hidden">
