@@ -45,7 +45,7 @@ interface PhotoItem {
 }
 
 interface Kennel { id: string; name: string; owner_id: string }
-interface Breed  { id: string; name: string; image_url: string | null }
+interface Breed  { id: string; name_pt: string; image_url: string | null }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -161,8 +161,8 @@ export default function NovoPostPage() {
     if (sheet !== "breed" || breeds.length > 0) return;
     supabase
       .from("breeds")
-      .select("id, name, image_url")
-      .order("name")
+      .select("id, name_pt, image_url")
+      .order("name_pt")
       .then(({ data }) => { if (data) setBreeds(data as Breed[]); });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sheet]);
@@ -294,7 +294,7 @@ export default function NovoPostPage() {
   const canPublish  = (photos.length > 0 || caption.trim().length > 0) && !submitting;
 
   const filteredKennels = kennels.filter((k) => k.name.toLowerCase().includes(kennelSearch.toLowerCase()));
-  const filteredBreeds  = breeds.filter((b)  => b.name.toLowerCase().includes(breedSearch.toLowerCase()));
+  const filteredBreeds  = breeds.filter((b)  => b.name_pt.toLowerCase().includes(breedSearch.toLowerCase()));
 
   return (
     <div className="min-h-screen bg-[#FFFBF5]">
@@ -780,7 +780,7 @@ export default function NovoPostPage() {
           filteredBreeds.map((b) => (
             <button
               key={b.id}
-              onClick={() => { setBreedId(b.id); setBreedName(b.name); setSheet(null); }}
+              onClick={() => { setBreedId(b.id); setBreedName(b.name_pt); setSheet(null); }}
               className="w-full flex items-center justify-between px-5 py-3.5 text-sm text-earth-800 hover:bg-brand-50 transition-colors"
             >
               <div className="flex items-center gap-3">
@@ -788,7 +788,7 @@ export default function NovoPostPage() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={b.image_url} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" />
                 )}
-                {b.name}
+                {b.name_pt}
               </div>
               {breedId === b.id && <Check className="w-4 h-4 text-brand-600 shrink-0" />}
             </button>
