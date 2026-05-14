@@ -53,10 +53,17 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { content, images = [], thumbnails = [] } = body;
+  const {
+    content = null,
+    images = [],
+    thumbnails = [],
+    kennel_id = null,
+    breed_id = null,
+    location = null,
+  } = body;
 
-  if (!content?.trim()) {
-    return NextResponse.json({ error: "Conteúdo obrigatório" }, { status: 400 });
+  if (!content?.trim() && images.length === 0) {
+    return NextResponse.json({ error: "Adicione texto ou pelo menos uma foto." }, { status: 400 });
   }
 
   // Get user role
@@ -105,17 +112,19 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const { data: post, error } = await supabase
-    .from("posts")
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: post, error } = await (supabase.from("posts") as any)
     .insert({
       author_id: user.id,
-      content: content.trim(),
+      content: content?.trim() ?? "",
       images,
       thumbnails,
+      kennel_id: kennel_id || null,
+      breed_id: breed_id || null,
+      location: location || null,
       status: "published",
-      // required legacy columns
-      title: content.trim().slice(0, 100),
-      type: "photo",
+      title: (content?.trim() ?? "").slice(0, 100) || "post",
+      type: images.length > 0 ? "photo" : "text",
     })
     .select(`
       id, author_id, content, images, thumbnails,
