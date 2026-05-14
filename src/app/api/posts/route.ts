@@ -64,7 +64,18 @@ export async function POST(request: NextRequest) {
 
   if (!content?.trim() && images.length === 0) {
     return NextResponse.json({ error: "Adicione texto ou pelo menos uma foto." }, { status: 400 });
+  const { content, image_url = null, image_key = null } = body;
+
+  if (!content?.trim() && !image_url) {
+    return NextResponse.json({ error: "Conteúdo ou imagem obrigatórios" }, { status: 400 });
   }
+
+  if (image_key && !image_key.startsWith(`feed-previews/${user.id}/`)) {
+    return NextResponse.json({ error: "Imagem inválida" }, { status: 400 });
+  }
+
+  const images: string[] = image_url ? [image_url] : [];
+  const thumbnails: string[] = image_url ? [image_url] : [];
 
   // Get user role
   const { data: profile } = await supabase
@@ -125,6 +136,9 @@ export async function POST(request: NextRequest) {
       status: "published",
       title: (content?.trim() ?? "").slice(0, 100) || "post",
       type: images.length > 0 ? "photo" : "text",
+      // required legacy columns
+      title: (content?.trim() ?? "").slice(0, 100),
+      type: "photo",
     })
     .select(`
       id, author_id, content, images, thumbnails,

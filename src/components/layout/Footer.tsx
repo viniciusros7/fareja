@@ -21,7 +21,6 @@ export default function Footer() {
               de canis verificados.
             </p>
           </div>
-
           {/* Links */}
           <div>
             <h4 className="text-sm font-semibold text-earth-800 mb-3">Plataforma</h4>
@@ -39,12 +38,11 @@ export default function Footer() {
               ))}
             </ul>
           </div>
-
           <div>
             <h4 className="text-sm font-semibold text-earth-800 mb-3">Suporte</h4>
             <ul className="space-y-2">
               {[
-                ["#", "Central de ajuda"],
+                ["/suporte", "Central de ajuda"],
                 ["/termos", "Termos de uso"],
                 ["/privacidade", "Política de privacidade"],
               ].map(([href, label]) => (
@@ -56,7 +54,6 @@ export default function Footer() {
               ))}
             </ul>
           </div>
-
           {/* Social */}
           <div>
             <h4 className="text-sm font-semibold text-earth-800 mb-3">Siga a Fareja</h4>
@@ -74,7 +71,6 @@ export default function Footer() {
             </p>
           </div>
         </div>
-
         <div className="mt-10 pt-6 border-t border-earth-200 text-center text-xs text-earth-400">
           © {new Date().getFullYear()} Fareja. Todos os direitos reservados.
         </div>
@@ -82,3 +78,4 @@ export default function Footer() {
     </footer>
   );
 }
+
