@@ -96,7 +96,7 @@ function Sheet({ open, onClose, title, children }: {
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-[#FFFBF5] rounded-t-2xl max-h-[80vh] flex flex-col">
+      <div className="relative bg-[#FFFBF5] rounded-t-2xl max-h-[90dvh] flex flex-col">
         <div className="flex items-center justify-between px-5 py-4 border-b border-earth-100 shrink-0">
           <h3 className="font-display text-lg font-medium text-earth-900">{title}</h3>
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-earth-100 transition-colors">
@@ -134,9 +134,29 @@ export default function NovoPostPage() {
   const [breedSearch, setBreedSearch]   = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [ownKennels, setOwnKennels] = useState<Kennel[]>([]);
 
   const supabase = createClient();
   const title    = TITLES[titleIdx];
+
+  // Pre-fetch user's own kennels and auto-select if exactly one
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("kennels")
+      .select("id, name, owner_id")
+      .eq("owner_id", user.id)
+      .eq("status", "approved")
+      .then(({ data }) => {
+        if (!data || data.length === 0) return;
+        setOwnKennels(data as Kennel[]);
+        if (data.length === 1 && !kennelId) {
+          setKennelId(data[0].id);
+          setKennelName(data[0].name);
+        }
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   useEffect(() => {
     if (sheet !== "kennel" || kennels.length > 0) return;
@@ -229,7 +249,9 @@ export default function NovoPostPage() {
         fd.append("file", file);
         const res = await fetch("/api/posts/preview-upload", { method: "POST", body: fd });
         if (!res.ok) throw new Error("Falha ao enviar foto. Tente novamente.");
-        const { url, thumbnailUrl } = await res.json();
+        const uploadData = await res.json().catch(() => null);
+        if (!uploadData?.url) throw new Error("Falha ao enviar foto. Tente novamente.");
+        const { url, thumbnailUrl } = uploadData;
         urls.push(url);
         thumbs.push(thumbnailUrl ?? url);
       }
@@ -246,8 +268,8 @@ export default function NovoPostPage() {
           location:  location || null,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erro ao publicar.");
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error ?? "Erro ao publicar.");
       photos.forEach((p) => URL.revokeObjectURL(p.localUrl));
       router.push("/comunidade/feed");
     } catch (err) {
@@ -281,7 +303,7 @@ export default function NovoPostPage() {
   const filteredBreeds  = breeds.filter((b)  => b.name_pt.toLowerCase().includes(breedSearch.toLowerCase()));
 
   return (
-    <div className="min-h-screen bg-[#FFFBF5]">
+    <div className="min-h-dvh bg-[#FFFBF5]">
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -460,6 +482,7 @@ export default function NovoPostPage() {
           placeholder="Conte sobre esse momento..."
           rows={3}
           className="w-full text-[15px] leading-relaxed text-earth-900 border-none outline-none resize-none bg-transparent placeholder:italic placeholder:font-display placeholder:text-earth-400 placeholder:text-[15px]"
+          style={{ fontFamily: '"DM Sans", system-ui, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif' }}
         />
 
         {/* Chips */}
@@ -471,7 +494,7 @@ export default function NovoPostPage() {
             }`}
           >
             <Store className="w-3 h-3 shrink-0" />
-            <span className="truncate max-w-[120px]">{kennelName ?? "+ Marcar canil"}</span>
+            <span className="truncate max-w-[160px]">{kennelName ?? "+ Marcar canil"}</span>
             {kennelId && (
               <span
                 role="button"
@@ -490,7 +513,7 @@ export default function NovoPostPage() {
             }`}
           >
             <Tag className="w-3 h-3 shrink-0" />
-            <span className="truncate max-w-[120px]">{breedName ?? "+ Raça"}</span>
+            <span className="truncate max-w-[160px]">{breedName ?? "+ Raça"}</span>
             {breedId && (
               <span
                 role="button"
@@ -509,7 +532,7 @@ export default function NovoPostPage() {
             }`}
           >
             <MapPin className="w-3 h-3 shrink-0" />
-            <span className="truncate max-w-[120px]">{location || "+ Localização"}</span>
+            <span className="truncate max-w-[160px]">{location || "+ Localização"}</span>
             {location && (
               <span
                 role="button"
@@ -566,28 +589,41 @@ export default function NovoPostPage() {
               onChange={(e) => setKennelSearch(e.target.value)}
               placeholder="Buscar canil..."
               className="w-full pl-9 pr-4 py-2.5 bg-earth-50 border border-earth-200 rounded-xl text-sm outline-none focus:border-brand-400"
-              autoFocus
             />
           </div>
         </div>
+        {ownKennels.length > 0 && !kennelSearch && (
+          <>
+            <p className="px-5 pt-3 pb-1 text-[11px] font-semibold text-earth-400 uppercase tracking-wider">Seus canis</p>
+            {ownKennels.map((k) => (
+              <button
+                key={k.id}
+                onClick={() => { setKennelId(k.id); setKennelName(k.name); setSheet(null); }}
+                className="w-full flex items-center justify-between px-5 py-3.5 text-sm text-earth-800 hover:bg-brand-50 transition-colors"
+              >
+                <span className="font-medium">{k.name}</span>
+                {kennelId === k.id && <Check className="w-4 h-4 text-brand-600 shrink-0" />}
+              </button>
+            ))}
+            <div className="mx-5 border-t border-earth-100 my-1" />
+            <p className="px-5 pt-2 pb-1 text-[11px] font-semibold text-earth-400 uppercase tracking-wider">Todos os canis</p>
+          </>
+        )}
         {filteredKennels.length === 0 ? (
           <p className="text-sm text-earth-400 text-center py-8">Nenhum canil encontrado</p>
         ) : (
-          filteredKennels.map((k) => (
-            <button
-              key={k.id}
-              onClick={() => { setKennelId(k.id); setKennelName(k.name); setSheet(null); }}
-              className="w-full flex items-center justify-between px-5 py-3.5 text-sm text-earth-800 hover:bg-brand-50 transition-colors"
-            >
-              <span>
-                {k.name}
-                {k.owner_id === user.id && (
-                  <span className="ml-2 text-[11px] text-brand-600 font-normal">(seu canil)</span>
-                )}
-              </span>
-              {kennelId === k.id && <Check className="w-4 h-4 text-brand-600 shrink-0" />}
-            </button>
-          ))
+          filteredKennels
+            .filter((k) => ownKennels.every((ok) => ok.id !== k.id) || !!kennelSearch)
+            .map((k) => (
+              <button
+                key={k.id}
+                onClick={() => { setKennelId(k.id); setKennelName(k.name); setSheet(null); }}
+                className="w-full flex items-center justify-between px-5 py-3.5 text-sm text-earth-800 hover:bg-brand-50 transition-colors"
+              >
+                <span>{k.name}</span>
+                {kennelId === k.id && <Check className="w-4 h-4 text-brand-600 shrink-0" />}
+              </button>
+            ))
         )}
       </Sheet>
 
@@ -601,7 +637,6 @@ export default function NovoPostPage() {
               onChange={(e) => setBreedSearch(e.target.value)}
               placeholder="Buscar raça..."
               className="w-full pl-9 pr-4 py-2.5 bg-earth-50 border border-earth-200 rounded-xl text-sm outline-none focus:border-brand-400"
-              autoFocus
             />
           </div>
         </div>
