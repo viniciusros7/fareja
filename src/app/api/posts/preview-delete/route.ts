@@ -8,21 +8,18 @@ export async function DELETE(request: NextRequest) {
 
   if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
-  const body = await request.json();
-  const { key } = body;
+  const body = await request.json().catch(() => ({}));
+  const keys: string[] = Array.isArray(body.keys) ? body.keys : body.key ? [body.key] : [];
 
-  if (!key || typeof key !== "string") {
-    return NextResponse.json({ error: "key obrigatória" }, { status: 400 });
+  if (keys.length === 0) {
+    return NextResponse.json({ error: "Nenhuma chave fornecida" }, { status: 400 });
   }
 
-  if (!key.startsWith(`feed-previews/${user.id}/`)) {
-    return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
+  const invalid = keys.find((k) => !k.startsWith(`posts/preview/${user.id}/`));
+  if (invalid) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 403 });
   }
 
-  try {
-    await deleteFile(key);
-    return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Falha ao deletar" }, { status: 502 });
-  }
+  await Promise.allSettled(keys.map((k) => deleteFile(k)));
+  return NextResponse.json({ ok: true });
 }

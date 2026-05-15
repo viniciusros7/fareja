@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Instrument_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import BottomNav from "@/components/layout/BottomNav";
-import PrivacyModal from "@/components/PrivacyModal";
+import LayoutShell from "@/components/layout/LayoutShell";
 
 const fraunces = Fraunces({
   subsets: ["latin", "latin-ext"],
@@ -54,11 +51,7 @@ export default function RootLayout({
       className={`${fraunces.variable} ${instrumentSans.variable} ${instrumentSerif.variable}`}
     >
       <body className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 pb-20 md:pb-0 page-enter">{children}</main>
-        <Footer />
-        <BottomNav />
-        <PrivacyModal />
+        <LayoutShell>{children}</LayoutShell>
       </body>
     </html>
   );
